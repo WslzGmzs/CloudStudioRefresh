@@ -1,0 +1,54 @@
+{
+  "name": "cloudstudio-monitor",
+  "version": "1.0.0",
+  "description": "CloudStudio 监控管理系统 - 具备 Web 管理界面的 Deno Deploy 兼容应用",
+  "author": "CloudStudio Monitor Team",
+  "license": "MIT",
+  "exports": "./cloudStudioRefresh.ts",
+  "tasks": {
+    "start": "deno run --allow-net --allow-kv cloudStudioRefresh.ts",
+    "test": "deno run --allow-net --allow-kv cloudStudioRefresh.ts --test",
+    "dev": "deno run --allow-net --allow-kv --watch cloudStudioRefresh.ts",
+    "check": "deno check cloudStudioRefresh.ts",
+    "fmt": "deno fmt cloudStudioRefresh.ts README.md",
+    "lint": "deno lint cloudStudioRefresh.ts"
+  },
+  "permissions": {
+    "net": true,
+    "kv": true
+  },
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
+  },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 100,
+    "indentWidth": 2,
+    "semiColons": true,
+    "singleQuote": true,
+    "proseWrap": "preserve"
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"]
+    }
+  },
+  "deploy": {
+    "project": "cloudstudio-monitor",
+    "entrypoint": "cloudStudioRefresh.ts",
+    "include": [
+      "cloudStudioRefresh.ts",
+      "README.md",
+      "deno.json"
+    ],
+    "exclude": [
+      "data/",
+      "*.log",
+      ".git/"
+    ]
+  }
+}
