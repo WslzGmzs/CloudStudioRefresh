@@ -30,51 +30,61 @@
 git clone https://github.com/WslzGmzs/CloudStudioRefresh.git
 cd CloudStudioRefresh
 
-# Run development version (includes testing features)
+# Run the application
 deno run --allow-net --allow-kv --unstable-kv cloudStudioRefresh.ts
-
-# Run production version (recommended)
-deno run --allow-net --allow-kv --unstable-kv cloudStudioRefresh.prod.ts
 ```
 
 ### Deno Deploy Deployment
 
-#### ⚠️ Important: File Size Limit Solution
-
-**Issue**: Original file `cloudStudioRefresh.ts` (139KB) exceeds Deno Deploy's 128KB limit
-**Solution**: Use optimized production version `cloudStudioRefresh.prod.ts` (39KB)
-
 #### Method 1: Direct File Upload (Recommended)
 1. Visit [Deno Deploy](https://dash.deno.com/)
 2. Create new project
-3. **Upload `cloudStudioRefresh.prod.ts` file** (Important: use production version)
+3. **Upload `cloudStudioRefresh.ts` file**
 4. Set environment variables (optional)
 5. Deploy complete
 
 #### Method 2: GitHub Integration
 1. Fork this repository to your GitHub account
 2. Connect GitHub repository in Deno Deploy
-3. **Select `cloudStudioRefresh.prod.ts` as entry file**
+3. **Select `cloudStudioRefresh.ts` as entry file**
 4. Automatic deployment
 
 ## 📁 Project Structure
 
 ```
 CloudStudioRefresh/
-├── cloudStudioRefresh.ts      # Development version (139KB, includes testing)
-├── cloudStudioRefresh.prod.ts # Production version (39KB, recommended for deploy) ⭐
+├── cloudStudioRefresh.ts      # Main application file (single-file deployment)
 ├── deno.json                  # Deno configuration file
 ├── deploy.sh                  # Deployment script
 ├── README.md                  # English documentation
 ├── README_CN.md               # Chinese documentation
+├── ARCHITECTURE.md            # System architecture documentation
+├── API.md                     # Complete API documentation
+├── DEPLOYMENT.md              # Detailed deployment guide
+├── CHANGELOG.md               # Version update log
+├── PROJECT_OVERVIEW.md        # Project overview and navigation
 ├── FEATURES_UPDATE.md         # Feature update log
-└── HOTFIX.md                  # Hotfix records
+├── HOTFIX.md                  # Hotfix records
+└── data/                      # Data storage directory (auto-created)
+    └── kv-store/              # Deno KV database files
 ```
 
 ### File Description
 
-- **`cloudStudioRefresh.ts`**: Complete development version with integration tests, deployment tools, etc.
-- **`cloudStudioRefresh.prod.ts`**: Production optimized version, removed test code, file size optimized (39KB vs 139KB)
+- **`cloudStudioRefresh.ts`**: Complete application with web interface, monitoring system, and all features
+- **`deno.json`**: Deno configuration with tasks, permissions, and project settings
+- **`deploy.sh`**: Automated deployment script with compatibility checks
+- **`data/`**: Local data storage directory (created automatically)
+
+### 📚 Documentation Navigation
+
+- 📖 **[Project Overview](PROJECT_OVERVIEW.md)** - Complete project introduction and navigation
+- 🏗️ **[Architecture](ARCHITECTURE.md)** - System architecture and technical stack
+- 📡 **[API Documentation](API.md)** - Complete API reference and examples
+- 🚀 **[Deployment Guide](DEPLOYMENT.md)** - Detailed deployment instructions
+- 📝 **[Changelog](CHANGELOG.md)** - Version history and updates
+- 🎉 **[Feature Updates](FEATURES_UPDATE.md)** - New features and improvements
+- 🔧 **[Hotfix Records](HOTFIX.md)** - Common issues and solutions
 
 ## ⚙️ Configuration
 
@@ -164,8 +174,8 @@ chmod +x deploy.sh
 ./deploy.sh
 
 # Manual check
-deno check cloudStudioRefresh.prod.ts
-deno run --allow-net --allow-kv --unstable-kv cloudStudioRefresh.prod.ts
+deno check cloudStudioRefresh.ts
+deno run --allow-net --allow-kv --unstable-kv cloudStudioRefresh.ts
 ```
 
 ## 💡 Usage Examples
@@ -207,15 +217,15 @@ deno run --allow-net --allow-kv --unstable-kv cloudStudioRefresh.prod.ts
 
 ### Common Issues
 
-#### 1. Deployment Failed: File Size Exceeds Limit
-**Error**: "A playground snippet can not be larger than 128kb"
-**Solution**: Use `cloudStudioRefresh.prod.ts` file for deployment
+#### 1. Deployment Issues
+**Common Issues**: File upload or GitHub integration problems
+**Solution**: Ensure you're using the correct file and have proper permissions
 
 #### 2. Cannot Access Management Interface
 **Solution**:
 ```bash
 # Check if application started normally
-deno run --allow-net --allow-kv --unstable-kv cloudStudioRefresh.prod.ts
+deno run --allow-net --allow-kv --unstable-kv cloudStudioRefresh.ts
 
 # Check if port is occupied
 netstat -an | grep 8000
@@ -238,15 +248,15 @@ curl http://localhost:8000/api/system/health
 
 ## 🔄 Changelog
 
-### v1.0.1 (2025-01-31) - Deployment Optimization
+### v1.0.1 (2025-01-31) - Documentation and Deployment Optimization
 
 #### 🚀 Major Improvements
-- **Production Version Optimization**: Created `cloudStudioRefresh.prod.ts` to solve Deno Deploy 128KB limit
-- **File Size Optimization**: Reduced from 139KB to 39KB (72% reduction)
-- **Deployment Compatibility**: Perfect support for Deno Deploy requirements
+- **Complete Documentation**: Added comprehensive technical documentation
+- **Deployment Simplification**: Streamlined deployment process with single file
+- **Documentation Consistency**: Fixed all inconsistencies in project documentation
 
 #### ✨ New Features
-- **Dual Version Support**: Development version (full features) + Production version (optimized deployment)
+- **Technical Documentation**: Architecture, API, and deployment guides
 - **TypeScript Optimization**: Fixed all type errors, ensuring type safety
 - **Configuration Optimization**: Improved deno.json configuration, eliminated warnings
 

@@ -43,12 +43,18 @@
     "include": [
       "cloudStudioRefresh.ts",
       "README.md",
-      "deno.json"
+      "README_CN.md",
+      "deno.json",
+      "ARCHITECTURE.md",
+      "API.md",
+      "DEPLOYMENT.md"
     ],
     "exclude": [
       "data/",
       "*.log",
-      ".git/"
+      ".git/",
+      "node_modules/",
+      "*.tmp"
     ]
   }
 }

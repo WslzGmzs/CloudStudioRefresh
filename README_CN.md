@@ -30,51 +30,61 @@
 git clone https://github.com/WslzGmzs/CloudStudioRefresh.git
 cd CloudStudioRefresh
 
-# 运行开发版本（包含测试功能）
+# 运行应用程序
 deno run --allow-net --allow-kv --unstable-kv cloudStudioRefresh.ts
-
-# 运行生产版本（推荐）
-deno run --allow-net --allow-kv --unstable-kv cloudStudioRefresh.prod.ts
 ```
 
 ### Deno Deploy 部署
 
-#### ⚠️ 重要：文件大小限制解决方案
-
-**问题**：原始文件 `cloudStudioRefresh.ts` (139KB) 超过 Deno Deploy 128KB 限制
-**解决方案**：使用优化的生产版本 `cloudStudioRefresh.prod.ts` (39KB)
-
 #### 方法一：直接上传文件（推荐）
 1. 访问 [Deno Deploy](https://dash.deno.com/)
 2. 创建新项目
-3. **上传 `cloudStudioRefresh.prod.ts` 文件**（重要：使用生产版本）
+3. **上传 `cloudStudioRefresh.ts` 文件**
 4. 设置环境变量（可选）
 5. 部署完成
 
 #### 方法二：GitHub 集成
 1. Fork 此仓库到你的 GitHub 账户
 2. 在 Deno Deploy 中连接 GitHub 仓库
-3. **选择 `cloudStudioRefresh.prod.ts` 作为入口文件**
+3. **选择 `cloudStudioRefresh.ts` 作为入口文件**
 4. 自动部署
 
 ## 📁 项目结构
 
 ```
 CloudStudioRefresh/
-├── cloudStudioRefresh.ts      # 开发版本（139KB，包含测试功能）
-├── cloudStudioRefresh.prod.ts # 生产版本（39KB，推荐部署）⭐
+├── cloudStudioRefresh.ts      # 主应用文件（单文件部署）
 ├── deno.json                  # Deno 配置文件
 ├── deploy.sh                  # 部署脚本
 ├── README.md                  # 英文文档
 ├── README_CN.md               # 中文文档
+├── ARCHITECTURE.md            # 系统架构文档
+├── API.md                     # 完整 API 文档
+├── DEPLOYMENT.md              # 详细部署指南
+├── CHANGELOG.md               # 版本更新日志
+├── PROJECT_OVERVIEW.md        # 项目总览和导航
 ├── FEATURES_UPDATE.md         # 功能更新日志
-└── HOTFIX.md                  # 热修复记录
+├── HOTFIX.md                  # 热修复记录
+└── data/                      # 数据存储目录（自动创建）
+    └── kv-store/              # Deno KV 数据库文件
 ```
 
 ### 文件说明
 
-- **`cloudStudioRefresh.ts`**: 完整开发版本，包含集成测试、部署工具等开发功能
-- **`cloudStudioRefresh.prod.ts`**: 生产优化版本，移除测试代码，文件大小优化（39KB vs 139KB）
+- **`cloudStudioRefresh.ts`**: 完整应用程序，包含 Web 界面、监控系统和所有功能
+- **`deno.json`**: Deno 配置文件，包含任务、权限和项目设置
+- **`deploy.sh`**: 自动化部署脚本，包含兼容性检查
+- **`data/`**: 本地数据存储目录（自动创建）
+
+### 📚 文档导航
+
+- 📖 **[项目总览](PROJECT_OVERVIEW.md)** - 完整的项目介绍和导航
+- 🏗️ **[系统架构](ARCHITECTURE.md)** - 系统架构和技术栈说明
+- 📡 **[API 文档](API.md)** - 完整的 API 参考和示例
+- 🚀 **[部署指南](DEPLOYMENT.md)** - 详细的部署说明
+- 📝 **[更新日志](CHANGELOG.md)** - 版本历史和更新记录
+- 🎉 **[功能更新](FEATURES_UPDATE.md)** - 新功能和改进说明
+- 🔧 **[热修复记录](HOTFIX.md)** - 常见问题和解决方案
 
 ## ⚙️ 配置说明
 
@@ -164,8 +174,8 @@ chmod +x deploy.sh
 ./deploy.sh
 
 # 手动检查
-deno check cloudStudioRefresh.prod.ts
-deno run --allow-net --allow-kv --unstable-kv cloudStudioRefresh.prod.ts
+deno check cloudStudioRefresh.ts
+deno run --allow-net --allow-kv --unstable-kv cloudStudioRefresh.ts
 ```
 
 ## 💡 使用示例
@@ -207,15 +217,15 @@ deno run --allow-net --allow-kv --unstable-kv cloudStudioRefresh.prod.ts
 
 ### 常见问题
 
-#### 1. 部署失败：文件大小超过限制
-**错误信息**: "A playground snippet can not be larger than 128kb"
-**解决方案**: 使用 `cloudStudioRefresh.prod.ts` 文件进行部署
+#### 1. 部署问题
+**常见问题**: 文件上传或 GitHub 集成问题
+**解决方案**: 确保使用正确的文件并具有适当的权限
 
 #### 2. 无法访问管理界面
 **解决方案**:
 ```bash
 # 检查应用是否正常启动
-deno run --allow-net --allow-kv --unstable-kv cloudStudioRefresh.prod.ts
+deno run --allow-net --allow-kv --unstable-kv cloudStudioRefresh.ts
 
 # 检查端口是否被占用
 netstat -an | grep 8000
@@ -238,15 +248,15 @@ curl http://localhost:8000/api/system/health
 
 ## 🔄 更新日志
 
-### v1.0.1 (2025-01-31) - 部署优化
+### v1.0.1 (2025-01-31) - 文档和部署优化
 
 #### 🚀 重大改进
-- **生产版本优化**: 创建 `cloudStudioRefresh.prod.ts` 解决 Deno Deploy 128KB 限制
-- **文件大小优化**: 从 139KB 减少到 39KB（减少 72%）
-- **部署兼容性**: 完美支持 Deno Deploy 部署要求
+- **完整技术文档**: 新增全面的技术文档体系
+- **部署流程简化**: 简化为单文件部署流程
+- **文档一致性**: 修正项目文档中的所有不一致问题
 
 #### ✨ 新增功能
-- **双版本支持**: 开发版本（完整功能）+ 生产版本（优化部署）
+- **技术文档**: 架构文档、API 文档和部署指南
 - **TypeScript 优化**: 修复所有类型错误，确保类型安全
 - **配置优化**: 完善 deno.json 配置，消除警告
 

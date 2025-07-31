@@ -2035,122 +2035,21 @@ async function handleLoginPage(request: Request): Promise<Response> {
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <title>CloudStudio 监控管理系统 - 登录</title>
       <style>
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
-
-        body {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          min-height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 20px;
-        }
-
-        .login-container {
-          background: white;
-          border-radius: 12px;
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-          padding: 40px;
-          width: 100%;
-          max-width: 400px;
-          text-align: center;
-        }
-
-        .logo {
-          font-size: 2.5rem;
-          color: #667eea;
-          margin-bottom: 10px;
-          font-weight: bold;
-        }
-
-        .subtitle {
-          color: #666;
-          margin-bottom: 30px;
-          font-size: 1.1rem;
-        }
-
-        .form-group {
-          margin-bottom: 20px;
-          text-align: left;
-        }
-
-        .form-label {
-          display: block;
-          margin-bottom: 8px;
-          color: #333;
-          font-weight: 500;
-        }
-
-        .form-input {
-          width: 100%;
-          padding: 12px 16px;
-          border: 2px solid #e1e5e9;
-          border-radius: 8px;
-          font-size: 16px;
-          transition: border-color 0.3s ease;
-        }
-
-        .form-input:focus {
-          outline: none;
-          border-color: #667eea;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .login-btn {
-          width: 100%;
-          padding: 14px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          border: none;
-          border-radius: 8px;
-          font-size: 16px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .login-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .login-btn:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-          transform: none;
-          box-shadow: none;
-        }
-
-        .error-message {
-          background: #fee;
-          color: #c53030;
-          padding: 12px;
-          border-radius: 8px;
-          margin-bottom: 20px;
-          border: 1px solid #fed7d7;
-          display: none;
-        }
-
-        .loading {
-          display: none;
-          margin-top: 10px;
-          color: #666;
-        }
-
-        @media (max-width: 480px) {
-          .login-container {
-            padding: 30px 20px;
-          }
-
-          .logo {
-            font-size: 2rem;
-          }
-        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+        .login-container{background:white;border-radius:12px;box-shadow:0 20px 40px rgba(0,0,0,0.1);padding:40px;width:100%;max-width:400px;text-align:center}
+        .logo{font-size:2.5rem;color:#667eea;margin-bottom:10px;font-weight:bold}
+        .subtitle{color:#666;margin-bottom:30px;font-size:1.1rem}
+        .form-group{margin-bottom:20px;text-align:left}
+        .form-label{display:block;margin-bottom:8px;color:#333;font-weight:500}
+        .form-input{width:100%;padding:12px 16px;border:2px solid #e1e5e9;border-radius:8px;font-size:16px;transition:border-color 0.3s ease}
+        .form-input:focus{outline:none;border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,0.1)}
+        .login-btn{width:100%;padding:14px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;transition:transform 0.2s ease,box-shadow 0.2s ease}
+        .login-btn:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(102,126,234,0.3)}
+        .login-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;box-shadow:none}
+        .error-message{background:#fee;color:#c53030;padding:12px;border-radius:8px;margin-bottom:20px;border:1px solid #fed7d7;display:none}
+        .loading{display:none;margin-top:10px;color:#666}
+        @media (max-width:480px){.login-container{padding:30px 20px}.logo{font-size:2rem}}
       </style>
     </head>
     <body>
@@ -2278,575 +2177,93 @@ async function handleDashboard(request: Request): Promise<Response> {
       <title>CloudStudio 监控管理系统 - 仪表板</title>
       <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
       <style>
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
-
-        body {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-          background: #f5f7fa;
-          color: #333;
-          line-height: 1.6;
-        }
-
-        .header {
-          background: white;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-          padding: 1rem 2rem;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-
-        .logo {
-          font-size: 1.5rem;
-          font-weight: bold;
-          color: #667eea;
-        }
-
-        .nav-menu {
-          display: flex;
-          gap: 1rem;
-        }
-
-        .nav-btn {
-          background: none;
-          border: none;
-          padding: 0.5rem 1rem;
-          border-radius: 6px;
-          cursor: pointer;
-          font-size: 0.9rem;
-          color: #666;
-          transition: all 0.2s ease;
-        }
-
-        .nav-btn:hover {
-          background: #f0f0f0;
-          color: #333;
-        }
-
-        .nav-btn.active {
-          background: #667eea;
-          color: white;
-        }
-
-        .user-menu {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-        }
-
-        .logout-btn {
-          background: #e53e3e;
-          color: white;
-          border: none;
-          padding: 0.5rem 1rem;
-          border-radius: 6px;
-          cursor: pointer;
-          font-size: 0.9rem;
-          transition: background 0.2s ease;
-        }
-
-        .logout-btn:hover {
-          background: #c53030;
-        }
-
-        .container {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 2rem;
-        }
-
-        .page-title {
-          font-size: 2rem;
-          margin-bottom: 2rem;
-          color: #2d3748;
-        }
-
-        .stats-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-          gap: 1.5rem;
-          margin-bottom: 2rem;
-        }
-
-        .stat-card {
-          background: white;
-          padding: 1.5rem;
-          border-radius: 12px;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-          border-left: 4px solid #667eea;
-        }
-
-        .stat-title {
-          font-size: 0.9rem;
-          color: #666;
-          margin-bottom: 0.5rem;
-        }
-
-        .stat-value {
-          font-size: 2rem;
-          font-weight: bold;
-          color: #2d3748;
-        }
-
-        .monitors-section {
-          background: white;
-          border-radius: 12px;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-          overflow: hidden;
-        }
-
-        .section-header {
-          padding: 1.5rem;
-          border-bottom: 1px solid #e2e8f0;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-
-        .section-title {
-          font-size: 1.25rem;
-          font-weight: 600;
-          color: #2d3748;
-        }
-
-        .add-btn {
-          background: #667eea;
-          color: white;
-          border: none;
-          padding: 0.75rem 1.5rem;
-          border-radius: 8px;
-          cursor: pointer;
-          font-size: 0.9rem;
-          font-weight: 500;
-          transition: background 0.2s ease;
-        }
-
-        .add-btn:hover {
-          background: #5a67d8;
-        }
-
-        .monitors-list {
-          padding: 1.5rem;
-        }
-
-        .monitor-item {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 1rem;
-          border: 1px solid #e2e8f0;
-          border-radius: 8px;
-          margin-bottom: 1rem;
-          transition: box-shadow 0.2s ease;
-        }
-
-        .monitor-item:hover {
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .monitor-info {
-          flex: 1;
-        }
-
-        .monitor-name {
-          font-weight: 600;
-          color: #2d3748;
-          margin-bottom: 0.25rem;
-        }
-
-        .monitor-url {
-          color: #666;
-          font-size: 0.9rem;
-          word-break: break-all;
-        }
-
-        .monitor-status {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-        }
-
-        .status-badge {
-          padding: 0.25rem 0.75rem;
-          border-radius: 20px;
-          font-size: 0.8rem;
-          font-weight: 500;
-        }
-
-        .status-success {
-          background: #c6f6d5;
-          color: #22543d;
-        }
-
-        .status-error {
-          background: #fed7d7;
-          color: #742a2a;
-        }
-
-        .status-pending {
-          background: #feebc8;
-          color: #744210;
-        }
-
-        .monitor-actions {
-          display: flex;
-          gap: 0.5rem;
-        }
-
-        .action-btn {
-          padding: 0.5rem;
-          border: none;
-          border-radius: 6px;
-          cursor: pointer;
-          font-size: 0.8rem;
-          transition: background 0.2s ease;
-        }
-
-        .edit-btn {
-          background: #bee3f8;
-          color: #2c5282;
-        }
-
-        .edit-btn:hover {
-          background: #90cdf4;
-        }
-
-        .delete-btn {
-          background: #fed7d7;
-          color: #742a2a;
-        }
-
-        .delete-btn:hover {
-          background: #feb2b2;
-        }
-
-        .toggle-btn {
-          background: #d6f5d6;
-          color: #22543d;
-        }
-
-        .toggle-btn:hover {
-          background: #c6f6d5;
-        }
-
-        .toggle-btn.disabled {
-          background: #e2e8f0;
-          color: #666;
-        }
-
-        .modal {
-          display: none;
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, 0.5);
-          z-index: 1000;
-        }
-
-        .modal-content {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          background: white;
-          border-radius: 12px;
-          padding: 2rem;
-          width: 90%;
-          max-width: 500px;
-          max-height: 80vh;
-          overflow-y: auto;
-        }
-
-        .modal-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 1.5rem;
-        }
-
-        .modal-title {
-          font-size: 1.25rem;
-          font-weight: 600;
-          color: #2d3748;
-        }
-
-        .close-btn {
-          background: none;
-          border: none;
-          font-size: 1.5rem;
-          cursor: pointer;
-          color: #666;
-        }
-
-        .form-group {
-          margin-bottom: 1rem;
-        }
-
-        .form-label {
-          display: block;
-          margin-bottom: 0.5rem;
-          font-weight: 500;
-          color: #2d3748;
-        }
-
-        .form-input, .form-textarea {
-          width: 100%;
-          padding: 0.75rem;
-          border: 1px solid #e2e8f0;
-          border-radius: 6px;
-          font-size: 0.9rem;
-          transition: border-color 0.2s ease;
-        }
-
-        .form-input:focus, .form-textarea:focus {
-          outline: none;
-          border-color: #667eea;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .form-textarea {
-          resize: vertical;
-          min-height: 80px;
-        }
-
-        .form-checkbox {
-          margin-right: 0.5rem;
-        }
-
-        .form-actions {
-          display: flex;
-          gap: 1rem;
-          justify-content: flex-end;
-          margin-top: 1.5rem;
-        }
-
-        .btn-secondary {
-          background: #e2e8f0;
-          color: #4a5568;
-          border: none;
-          padding: 0.75rem 1.5rem;
-          border-radius: 6px;
-          cursor: pointer;
-          font-size: 0.9rem;
-          transition: background 0.2s ease;
-        }
-
-        .btn-secondary:hover {
-          background: #cbd5e0;
-        }
-
-        .btn-primary {
-          background: #667eea;
-          color: white;
-          border: none;
-          padding: 0.75rem 1.5rem;
-          border-radius: 6px;
-          cursor: pointer;
-          font-size: 0.9rem;
-          transition: background 0.2s ease;
-        }
-
-        .btn-primary:hover {
-          background: #5a67d8;
-        }
-
-        .loading {
-          text-align: center;
-          padding: 2rem;
-          color: #666;
-        }
-
-        .error-message {
-          background: #fed7d7;
-          color: #742a2a;
-          padding: 1rem;
-          border-radius: 6px;
-          margin-bottom: 1rem;
-          border: 1px solid #feb2b2;
-        }
-
-        .page-content {
-          display: block;
-        }
-
-        .page-content.hidden {
-          display: none;
-        }
-
-        .charts-section {
-          background: white;
-          border-radius: 12px;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-          margin-bottom: 2rem;
-          overflow: hidden;
-        }
-
-        .chart-controls {
-          display: flex;
-          gap: 1rem;
-          align-items: center;
-        }
-
-        .chart-container {
-          padding: 1.5rem;
-          position: relative;
-          height: 400px;
-        }
-
-        .logs-controls {
-          background: white;
-          padding: 1.5rem;
-          border-radius: 12px;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-          margin-bottom: 2rem;
-          display: flex;
-          gap: 1rem;
-          align-items: center;
-          flex-wrap: wrap;
-        }
-
-        .control-group {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        }
-
-        .control-group label {
-          font-weight: 500;
-          color: #2d3748;
-          white-space: nowrap;
-        }
-
-        .logs-section {
-          background: white;
-          border-radius: 12px;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-          overflow: hidden;
-        }
-
-        .logs-list {
-          max-height: 600px;
-          overflow-y: auto;
-        }
-
-        .log-item {
-          padding: 1rem;
-          border-bottom: 1px solid #e2e8f0;
-          font-family: 'Courier New', monospace;
-          font-size: 0.9rem;
-        }
-
-        .log-item:last-child {
-          border-bottom: none;
-        }
-
-        .log-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 0.5rem;
-        }
-
-        .log-level {
-          padding: 0.25rem 0.5rem;
-          border-radius: 4px;
-          font-size: 0.8rem;
-          font-weight: 500;
-        }
-
-        .log-level.INFO {
-          background: #c6f6d5;
-          color: #22543d;
-        }
-
-        .log-level.WARN {
-          background: #feebc8;
-          color: #744210;
-        }
-
-        .log-level.ERROR {
-          background: #fed7d7;
-          color: #742a2a;
-        }
-
-        .log-level.DEBUG {
-          background: #bee3f8;
-          color: #2c5282;
-        }
-
-        .log-time {
-          color: #666;
-          font-size: 0.8rem;
-        }
-
-        .log-message {
-          color: #2d3748;
-          margin-bottom: 0.5rem;
-        }
-
-        .log-monitor {
-          color: #667eea;
-          font-size: 0.8rem;
-        }
-
-        .pagination {
-          padding: 1rem;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          gap: 1rem;
-          border-top: 1px solid #e2e8f0;
-        }
-
-        @media (max-width: 768px) {
-          .header {
-            padding: 1rem;
-            flex-direction: column;
-            gap: 1rem;
-          }
-
-          .nav-menu {
-            order: -1;
-          }
-
-          .container {
-            padding: 1rem;
-          }
-
-          .stats-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .monitor-item {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 1rem;
-          }
-
-          .monitor-status {
-            width: 100%;
-            justify-content: space-between;
-          }
-
-          .logs-controls {
-            flex-direction: column;
-            align-items: stretch;
-          }
-
-          .control-group {
-            justify-content: space-between;
-          }
-
-          .chart-container {
-            height: 300px;
-          }
-        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f7fa;color:#333;line-height:1.6}
+        .header{background:white;box-shadow:0 2px 4px rgba(0,0,0,0.1);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center}
+        .logo{font-size:1.5rem;font-weight:bold;color:#667eea}
+        .nav-menu{display:flex;gap:1rem}
+        .nav-btn{background:none;border:none;padding:0.5rem 1rem;border-radius:6px;cursor:pointer;font-size:0.9rem;color:#666;transition:all 0.2s ease}
+        .nav-btn:hover{background:#f0f0f0;color:#333}
+        .nav-btn.active{background:#667eea;color:white}
+        .user-menu{display:flex;align-items:center;gap:1rem}
+        .logout-btn{background:#e53e3e;color:white;border:none;padding:0.5rem 1rem;border-radius:6px;cursor:pointer;font-size:0.9rem;transition:background 0.2s ease}
+        .logout-btn:hover{background:#c53030}
+        .container{max-width:1200px;margin:0 auto;padding:2rem}
+        .page-title{font-size:2rem;margin-bottom:2rem;color:#2d3748}
+        .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.5rem;margin-bottom:2rem}
+        .stat-card{background:white;padding:1.5rem;border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,0.05);border-left:4px solid #667eea}
+        .stat-title{font-size:0.9rem;color:#666;margin-bottom:0.5rem}
+        .stat-value{font-size:2rem;font-weight:bold;color:#2d3748}
+        .monitors-section{background:white;border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,0.05);overflow:hidden}
+
+        .section-header{padding:1.5rem;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center}
+        .section-title{font-size:1.25rem;font-weight:600;color:#2d3748}
+        .add-btn{background:#667eea;color:white;border:none;padding:0.75rem 1.5rem;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:500;transition:background 0.2s ease}
+        .add-btn:hover{background:#5a67d8}
+        .monitors-list{padding:1.5rem}
+        .monitor-item{display:flex;justify-content:space-between;align-items:center;padding:1rem;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:1rem;transition:box-shadow 0.2s ease}
+        .monitor-item:hover{box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+        .monitor-info{flex:1}
+        .monitor-name{font-weight:600;color:#2d3748;margin-bottom:0.25rem}
+        .monitor-url{color:#666;font-size:0.9rem;word-break:break-all}
+        .monitor-status{display:flex;align-items:center;gap:1rem}
+        .status-badge{padding:0.25rem 0.75rem;border-radius:20px;font-size:0.8rem;font-weight:500}
+        .status-success{background:#c6f6d5;color:#22543d}
+        .status-error{background:#fed7d7;color:#742a2a}
+        .status-pending{background:#feebc8;color:#744210}
+        .monitor-actions{display:flex;gap:0.5rem}
+        .action-btn{padding:0.5rem;border:none;border-radius:6px;cursor:pointer;font-size:0.8rem;transition:background 0.2s ease}
+        .edit-btn{background:#bee3f8;color:#2c5282}
+        .edit-btn:hover{background:#90cdf4}
+        .delete-btn{background:#fed7d7;color:#742a2a}
+        .delete-btn:hover{background:#feb2b2}
+        .toggle-btn{background:#d6f5d6;color:#22543d}
+        .toggle-btn:hover{background:#c6f6d5}
+        .toggle-btn.disabled{background:#e2e8f0;color:#666}
+        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000}
+
+        .modal-content{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:white;border-radius:12px;padding:2rem;width:90%;max-width:500px;max-height:80vh;overflow-y:auto}
+        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem}
+        .modal-title{font-size:1.25rem;font-weight:600;color:#2d3748}
+        .close-btn{background:none;border:none;font-size:1.5rem;cursor:pointer;color:#666}
+        .form-group{margin-bottom:1rem}
+        .form-label{display:block;margin-bottom:0.5rem;font-weight:500;color:#2d3748}
+        .form-input,.form-textarea{width:100%;padding:0.75rem;border:1px solid #e2e8f0;border-radius:6px;font-size:0.9rem;transition:border-color 0.2s ease}
+        .form-input:focus,.form-textarea:focus{outline:none;border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,0.1)}
+        .form-textarea{resize:vertical;min-height:80px}
+        .form-checkbox{margin-right:0.5rem}
+        .form-actions{display:flex;gap:1rem;justify-content:flex-end;margin-top:1.5rem}
+        .btn-secondary{background:#e2e8f0;color:#4a5568;border:none;padding:0.75rem 1.5rem;border-radius:6px;cursor:pointer;font-size:0.9rem;transition:background 0.2s ease}
+        .btn-secondary:hover{background:#cbd5e0}
+        .btn-primary{background:#667eea;color:white;border:none;padding:0.75rem 1.5rem;border-radius:6px;cursor:pointer;font-size:0.9rem;transition:background 0.2s ease}
+        .btn-primary:hover{background:#5a67d8}
+        .loading{text-align:center;padding:2rem;color:#666}
+        .error-message{background:#fed7d7;color:#742a2a;padding:1rem;border-radius:6px;margin-bottom:1rem;border:1px solid #feb2b2}
+        .page-content{display:block}
+
+        .page-content.hidden{display:none}
+        .charts-section{background:white;border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,0.05);margin-bottom:2rem;overflow:hidden}
+        .chart-controls{display:flex;gap:1rem;align-items:center}
+        .chart-container{padding:1.5rem;position:relative;height:400px}
+        .logs-controls{background:white;padding:1.5rem;border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,0.05);margin-bottom:2rem;display:flex;gap:1rem;align-items:center;flex-wrap:wrap}
+        .control-group{display:flex;align-items:center;gap:0.5rem}
+        .control-group label{font-weight:500;color:#2d3748;white-space:nowrap}
+        .logs-section{background:white;border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,0.05);overflow:hidden}
+        .logs-list{max-height:600px;overflow-y:auto}
+        .log-item{padding:1rem;border-bottom:1px solid #e2e8f0;font-family:'Courier New',monospace;font-size:0.9rem}
+        .log-item:last-child{border-bottom:none}
+        .log-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem}
+        .log-level{padding:0.25rem 0.5rem;border-radius:4px;font-size:0.8rem;font-weight:500}
+        .log-level.INFO{background:#c6f6d5;color:#22543d}
+        .log-level.WARN{background:#feebc8;color:#744210}
+        .log-level.ERROR{background:#fed7d7;color:#742a2a}
+        .log-level.DEBUG{background:#bee3f8;color:#2c5282}
+
+        .log-time{color:#666;font-size:0.8rem}
+        .log-message{color:#2d3748;margin-bottom:0.5rem}
+        .log-monitor{color:#667eea;font-size:0.8rem}
+        .pagination{padding:1rem;display:flex;justify-content:center;align-items:center;gap:1rem;border-top:1px solid #e2e8f0}
+        @media (max-width:768px){.header{padding:1rem;flex-direction:column;gap:1rem}.nav-menu{order:-1}.container{padding:1rem}.stats-grid{grid-template-columns:1fr}.monitor-item{flex-direction:column;align-items:flex-start;gap:1rem}.monitor-status{width:100%;justify-content:space-between}.logs-controls{flex-direction:column;align-items:stretch}.control-group{justify-content:space-between}.chart-container{height:300px}}
       </style>
     </head>
     <body>
@@ -4803,433 +4220,19 @@ async function startApplication(): Promise<void> {
   }
 }
 
-// ================================
-// 集成测试和部署优化
-// ================================
-
-/**
- * 应用健康检查
- */
-async function performHealthCheck(): Promise<{
-  status: 'healthy' | 'unhealthy';
-  checks: Record<string, boolean>;
-  errors: string[];
-}> {
-  const checks: Record<string, boolean> = {};
-  const errors: string[] = [];
-
-  try {
-    // 检查 KV 数据库连接
-    try {
-      await ensureKV();
-      checks.database = true;
-    } catch (error) {
-      checks.database = false;
-      errors.push(`数据库连接失败: ${(error as Error).message}`);
-    }
-
-    // 检查监控调度器
-    const schedulerStatus = monitorScheduler.getStatus();
-    checks.scheduler = schedulerStatus.isRunning;
-    if (!schedulerStatus.isRunning) {
-      errors.push('监控调度器未运行');
-    }
-
-    // 检查监控配置
-    try {
-      const configs = await getAllMonitorConfigs();
-      checks.monitorConfigs = true;
-      console.log(`✅ 发现 ${configs.length} 个监控配置`);
-    } catch (error) {
-      checks.monitorConfigs = false;
-      errors.push(`监控配置加载失败: ${(error as Error).message}`);
-    }
-
-    const allHealthy = Object.values(checks).every((check) => check);
-
-    return {
-      status: allHealthy ? 'healthy' : 'unhealthy',
-      checks,
-      errors,
-    };
-  } catch (error) {
-    return {
-      status: 'unhealthy',
-      checks,
-      errors: [...errors, `健康检查失败: ${(error as Error).message}`],
-    };
-  }
-}
-
-/**
- * 性能测试
- */
-async function performanceTest(): Promise<void> {
-  console.log('🔬 开始性能测试...');
-
-  try {
-    // 测试 KV 存储性能
-    const startTime = Date.now();
-    const testConfig: MonitorConfig = {
-      id: 'test-performance',
-      name: '性能测试配置',
-      url: 'https://httpbin.org/status/200',
-      cookie: '',
-      interval: 1,
-      enabled: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    // 写入测试
-    await saveMonitorConfig(testConfig);
-    const writeTime = Date.now() - startTime;
-
-    // 读取测试
-    const readStart = Date.now();
-    await getMonitorConfig('test-performance');
-    const readTime = Date.now() - readStart;
-
-    // 清理测试数据
-    await deleteMonitorConfig('test-performance');
-
-    console.log(`📊 KV 存储性能: 写入 ${writeTime}ms, 读取 ${readTime}ms`);
-
-    // 测试监控执行性能
-    const monitorStart = Date.now();
-    const testResult = await executeMonitor({
-      ...testConfig,
-      url: 'https://httpbin.org/status/200',
-      enabled: true,
-    });
-    const monitorTime = Date.now() - monitorStart;
-
-    console.log(`📊 监控执行性能: ${monitorTime}ms (${testResult.success ? '成功' : '失败'})`);
-  } catch (error) {
-    console.error('❌ 性能测试失败:', error);
-  }
-}
-
-/**
- * API 接口测试
- */
-async function testAPIEndpoints(): Promise<void> {
-  console.log('🧪 开始 API 接口测试...');
-
-  const baseUrl = 'http://localhost:8000';
-  const testResults: Record<string, boolean> = {};
-
-  // 测试健康检查端点
-  try {
-    const response = await fetch(`${baseUrl}/api/system/health`);
-    testResults.health = response.ok;
-    console.log(`${response.ok ? '✅' : '❌'} 健康检查 API: ${response.status}`);
-  } catch (error) {
-    testResults.health = false;
-    console.log(`❌ 健康检查 API 测试失败: ${(error as Error).message}`);
-  }
-
-  // 测试系统信息端点
-  try {
-    const response = await fetch(`${baseUrl}/api/system/info`);
-    testResults.systemInfo = response.ok;
-    console.log(`${response.ok ? '✅' : '❌'} 系统信息 API: ${response.status}`);
-  } catch (error) {
-    testResults.systemInfo = false;
-    console.log(`❌ 系统信息 API 测试失败: ${(error as Error).message}`);
-  }
-
-  // 测试登录页面
-  try {
-    const response = await fetch(`${baseUrl}/`);
-    testResults.loginPage =
-      (response.ok && response.headers.get('content-type')?.includes('text/html')) ?? false;
-    console.log(`${testResults.loginPage ? '✅' : '❌'} 登录页面: ${response.status}`);
-  } catch (error) {
-    testResults.loginPage = false;
-    console.log(`❌ 登录页面测试失败: ${(error as Error).message}`);
-  }
-
-  const passedTests = Object.values(testResults).filter(Boolean).length;
-  const totalTests = Object.keys(testResults).length;
-  console.log(`📊 API 测试结果: ${passedTests}/${totalTests} 通过`);
-}
-
-/**
- * 部署兼容性检查
- */
-function checkDeployCompatibility(): {
-  compatible: boolean;
-  issues: string[];
-  recommendations: string[];
-} {
-  const issues: string[] = [];
-  const recommendations: string[] = [];
-
-  // 检查 Deno Deploy 兼容性
-  console.log('🔍 检查 Deno Deploy 兼容性...');
-
-  // 检查权限要求
-  const requiredPermissions = ['--allow-net', '--allow-kv'];
-  console.log(`✅ 所需权限: ${requiredPermissions.join(', ')}`);
-
-  // 检查环境变量使用
-  const envVars = ['PORT'];
-  console.log(`✅ 环境变量: ${envVars.join(', ')}`);
-
-  // 检查单文件架构
-  console.log('✅ 单文件架构: 符合 Deno Deploy 要求');
-
-  // 检查外部依赖
-  console.log('✅ 无外部依赖: 仅使用 Deno 内置 API');
-
-  // 性能建议
-  recommendations.push('建议在生产环境中设置适当的 PORT 环境变量');
-  recommendations.push('建议定期清理过期的会话和历史记录');
-  recommendations.push('建议监控 KV 存储使用量');
-
-  return {
-    compatible: issues.length === 0,
-    issues,
-    recommendations,
-  };
-}
-
-/**
- * 错误处理测试
- */
-async function testErrorHandling(): Promise<void> {
-  console.log('🛡️ 测试错误处理...');
-
-  try {
-    // 测试无效 URL 监控
-    const invalidConfig: MonitorConfig = {
-      id: 'test-invalid',
-      name: '无效 URL 测试',
-      url: 'invalid-url',
-      cookie: '',
-      interval: 1,
-      enabled: true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    const result = await executeMonitor(invalidConfig);
-    console.log(`${result.success ? '❌' : '✅'} 无效 URL 错误处理: ${result.error || '正确拒绝'}`);
-
-    // 测试网络超时
-    const timeoutConfig: MonitorConfig = {
-      id: 'test-timeout',
-      name: '超时测试',
-      url: 'https://httpbin.org/delay/35', // 35秒延迟，超过30秒超时
-      cookie: '',
-      interval: 1,
-      enabled: true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    const timeoutResult = await executeMonitor(timeoutConfig);
-    console.log(
-      `${timeoutResult.success ? '❌' : '✅'} 超时错误处理: ${timeoutResult.error || '正确超时'}`,
-    );
-  } catch (error) {
-    console.error('❌ 错误处理测试失败:', error);
-  }
-}
-
-/**
- * 内存使用优化检查
- */
-function checkMemoryUsage(): void {
-  console.log('💾 检查内存使用...');
-
-  // 在 Deno Deploy 环境中，内存信息可能不可用
-  try {
-    if (typeof Deno.memoryUsage === 'function') {
-      const memory = Deno.memoryUsage();
-      console.log(
-        `📊 内存使用: RSS ${Math.round(memory.rss / 1024 / 1024)}MB, Heap ${
-          Math.round(memory.heapUsed / 1024 / 1024)
-        }MB`,
-      );
-    } else {
-      console.log('ℹ️ 内存信息在当前环境中不可用');
-    }
-  } catch (error) {
-    console.log('ℹ️ 无法获取内存信息:', (error as Error).message);
-  }
-}
-
-/**
- * 生成部署文档
- */
-function generateDeploymentDocs(): string {
-  return `
-# CloudStudio 监控管理系统部署指南
-
-## 系统要求
-
-- Deno 1.40+ 或 Deno Deploy
-- 所需权限: --allow-net --allow-kv
-
-## 本地运行
-
-\`\`\`bash
-deno run --allow-net --allow-kv cloudStudioRefresh.ts
-\`\`\`
-
-## Deno Deploy 部署
-
-1. 将 cloudStudioRefresh.ts 文件上传到 Deno Deploy
-2. 设置环境变量（可选）:
-   - PORT: 服务器端口（默认 8000）
-3. 部署完成后访问 Web 界面
-
-## 默认配置
-
-- 管理员密码: admin123
-- 会话过期时间: 24 小时
-- 监控间隔: 1-60 分钟可配置
-- 最大并发监控: 10 个
-
-## 功能特性
-
-- ✅ Web 管理界面
-- ✅ 多站点监控配置
-- ✅ 身份验证和会话管理
-- ✅ 数据持久化存储
-- ✅ 实时监控状态
-- ✅ 监控历史记录
-- ✅ 响应式设计
-- ✅ 单文件部署
-
-## API 端点
-
-### 页面路由
-- GET / - 登录页面
-- GET /dashboard - 管理仪表板
-
-### 认证 API
-- POST /api/login - 用户登录
-- POST /api/logout - 用户登出
-- GET /api/auth/check - 认证状态检查
-
-### 监控配置 API
-- GET /api/monitors - 获取监控配置列表
-- POST /api/monitors - 创建监控配置
-- PUT /api/monitors/:id - 更新监控配置
-- DELETE /api/monitors/:id - 删除监控配置
-- GET /api/monitors/status - 获取监控状态
-
-### 系统 API
-- GET /api/system/info - 系统信息
-- GET /api/system/health - 健康检查
-- GET /api/scheduler/status - 调度器状态
-- POST /api/scheduler/restart - 重启调度器
-
-## 安全特性
-
-- 硬编码密码认证
-- 会话管理和自动过期
-- 登录频率限制
-- CSRF 防护
-- 安全的 Cookie 设置
-
-## 性能优化
-
-- 并发监控控制
-- 批量任务处理
-- 自动数据清理
-- KV 存储优化
-
-## 故障排除
-
-1. 检查权限设置
-2. 验证网络连接
-3. 查看控制台日志
-4. 使用健康检查 API
-
-## 更新日志
-
-v1.0.0 - 初始版本
-- 完整的监控管理系统
-- Web 管理界面
-- 数据持久化存储
-`;
-}
-
-/**
- * 执行完整的集成测试
- */
-async function runIntegrationTests(): Promise<void> {
-  console.log('\n🚀 开始集成测试和部署优化...\n');
-
-  // 1. 健康检查
-  console.log('='.repeat(50));
-  console.log('1. 应用健康检查');
-  console.log('='.repeat(50));
-  const healthCheck = await performHealthCheck();
-  console.log(`状态: ${healthCheck.status}`);
-  if (healthCheck.errors.length > 0) {
-    console.log('错误:', healthCheck.errors);
-  }
-
-  // 2. 性能测试
-  console.log('\n' + '='.repeat(50));
-  console.log('2. 性能测试');
-  console.log('='.repeat(50));
-  await performanceTest();
-
-  // 3. 错误处理测试
-  console.log('\n' + '='.repeat(50));
-  console.log('3. 错误处理测试');
-  console.log('='.repeat(50));
-  await testErrorHandling();
-
-  // 4. 部署兼容性检查
-  console.log('\n' + '='.repeat(50));
-  console.log('4. 部署兼容性检查');
-  console.log('='.repeat(50));
-  const compatibility = checkDeployCompatibility();
-  console.log(`兼容性: ${compatibility.compatible ? '✅ 兼容' : '❌ 不兼容'}`);
-  if (compatibility.issues.length > 0) {
-    console.log('问题:', compatibility.issues);
-  }
-  if (compatibility.recommendations.length > 0) {
-    console.log('建议:', compatibility.recommendations);
-  }
-
-  // 5. 内存使用检查
-  console.log('\n' + '='.repeat(50));
-  console.log('5. 内存使用检查');
-  console.log('='.repeat(50));
-  checkMemoryUsage();
-
-  // 6. 生成部署文档
-  console.log('\n' + '='.repeat(50));
-  console.log('6. 部署文档');
-  console.log('='.repeat(50));
-  const docs = generateDeploymentDocs();
-  console.log('✅ 部署文档已生成');
-
-  console.log('\n🎉 集成测试和部署优化完成！');
-  console.log('\n📋 测试总结:');
-  console.log(`- 应用健康状态: ${healthCheck.status}`);
-  console.log(`- Deno Deploy 兼容性: ${compatibility.compatible ? '✅' : '❌'}`);
-  console.log('- 性能测试: 已完成');
-  console.log('- 错误处理: 已验证');
-  console.log('- 部署文档: 已生成');
-}
-
 // 检查是否在测试模式
 const isTestMode = Deno.args.includes('--test');
 
 if (isTestMode) {
-  // 测试模式：运行集成测试
-  console.log('🧪 运行在测试模式');
-  await runIntegrationTests();
+  console.log('🧪 测试模式：运行基本健康检查');
+  try {
+    await ensureKV();
+    console.log('✅ 数据库连接正常');
+    console.log('✅ 应用启动就绪');
+  } catch (error) {
+    console.error('❌ 健康检查失败:', error);
+    Deno.exit(1);
+  }
 } else {
-  // 正常模式：启动应用
   startApplication();
 }
