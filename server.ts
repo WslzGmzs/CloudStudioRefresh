@@ -8,6 +8,7 @@ import { HTTP_STATUS } from '@/config/constants.ts';
 import { APP_METADATA } from '@/config/constants.ts';
 import { kvService } from '@/services/kv.ts';
 import { monitorScheduler } from '@/services/scheduler.ts';
+import { logger } from '@/services/logger.ts';
 import { createHtmlResponse, createJsonResponse, createApiResponse, createTextResponse } from '@/utils/response.ts';
 
 // API 路由处理器
@@ -28,6 +29,10 @@ import {
   handleSchedulerStatusAPI,
   handleClearCacheAPI
 } from '@/api/system.ts';
+import {
+  handleGetLogsAPI,
+  handleExportLogsAPI
+} from '@/api/logs.ts';
 
 // 应用启动时间
 const startTime = Date.now();
@@ -206,6 +211,15 @@ async function handleAPIRoutes(request: Request, pathname: string, method: strin
     return await handleOverviewStatsAPI(request);
   }
 
+  // 系统日志相关 API
+  if (pathname === '/api/logs' && method === 'GET') {
+    return await handleGetLogsAPI(request);
+  }
+
+  if (pathname === '/api/logs/export' && method === 'GET') {
+    return await handleExportLogsAPI(request);
+  }
+
   // 系统信息 API
   if (pathname === '/api/system/info' && method === 'GET') {
     return await handleSystemInfoAPI(request);
@@ -310,6 +324,9 @@ async function startApplication(): Promise<void> {
 
     // 启动监控调度器
     await monitorScheduler.start();
+
+    // 记录系统启动日志
+    await logger.logSystemStart();
 
     console.log('✅ 系统初始化完成');
 

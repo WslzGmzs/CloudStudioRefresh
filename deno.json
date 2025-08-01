@@ -6,12 +6,12 @@
   "license": "MIT",
   "exports": "./server.ts",
   "tasks": {
-    "start": "deno run --allow-net --allow-kv --allow-read --allow-write server.ts",
-    "dev": "deno run --allow-net --allow-kv --allow-read --allow-write --watch server.ts",
+    "start": "deno run --allow-net --allow-read --allow-write --allow-env --unstable-kv server.ts",
+    "dev": "deno run --allow-net --allow-read --allow-write --allow-env --unstable-kv --watch server.ts",
     "check": "deno check server.ts",
     "fmt": "deno fmt **/*.ts **/*.js public/**/*.html README.md",
     "lint": "deno lint **/*.ts",
-    "legacy": "deno run --allow-net --allow-kv cloudStudioRefresh.ts"
+    "legacy": "deno run --allow-net --allow-env --unstable-kv cloudStudioRefresh.ts"
   },
   "imports": {
     "@/": "./",

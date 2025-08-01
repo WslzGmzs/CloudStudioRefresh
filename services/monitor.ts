@@ -7,6 +7,7 @@ import { CACHE_KEYS, CACHE_TTL, QUERY_LIMITS } from '@/config/constants.ts';
 import type { MonitorConfig, MonitorResult, MonitorHistory, MonitorExecutionOptions } from '@/models/monitor.ts';
 import { kvService } from '@/services/kv.ts';
 import { globalCache } from '@/services/cache.ts';
+import { logger } from '@/services/logger.ts';
 import { generateId } from '@/utils/helpers.ts';
 
 /**
@@ -39,6 +40,7 @@ export class MonitorService {
 
     try {
       console.log(`🔍 开始监控: ${config.name} (${config.url})`);
+      await logger.logMonitorStart(config.id, config.name, config.url);
 
       // 准备请求头
       const headers = new Headers({
@@ -83,10 +85,12 @@ export class MonitorService {
 
       if (isSuccess) {
         console.log(`✅ 监控成功: ${config.name} (${responseTime}ms)`);
+        await logger.logMonitorSuccess(config.id, config.name, config.url, responseTime, response.status);
         result = this.createMonitorResult(true, responseTime, response.status);
       } else {
         const errorMsg = `HTTP ${response.status}: ${response.statusText}`;
         console.log(`❌ 监控失败: ${config.name} - ${errorMsg} (${responseTime}ms)`);
+        await logger.logMonitorError(config.id, config.name, config.url, errorMsg, responseTime);
         result = this.createMonitorResult(false, responseTime, response.status, errorMsg);
       }
 
@@ -111,6 +115,7 @@ export class MonitorService {
       }
 
       console.error(`💥 监控最终失败: ${config.name} - ${errorMsg}`);
+      await logger.logMonitorError(config.id, config.name, config.url, errorMsg, responseTime);
       const result = this.createMonitorResult(false, responseTime, undefined, errorMsg);
 
       // 保存历史记录

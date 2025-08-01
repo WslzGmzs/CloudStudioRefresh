@@ -151,6 +151,40 @@ class API {
     }
 
     // ================================
+    // 系统日志相关 API
+    // ================================
+
+    /**
+     * 获取系统日志
+     */
+    async getLogs(options = {}) {
+        const params = new URLSearchParams();
+
+        if (options.level) params.append('level', options.level);
+        if (options.monitorId) params.append('monitorId', options.monitorId);
+        if (options.page) params.append('page', options.page.toString());
+        if (options.limit) params.append('limit', options.limit.toString());
+        if (options.search) params.append('search', options.search);
+
+        const url = `/api/logs${params.toString() ? '?' + params.toString() : ''}`;
+        return this.get(url);
+    }
+
+    /**
+     * 导出系统日志
+     */
+    async exportLogs(options = {}) {
+        const params = new URLSearchParams();
+
+        if (options.level) params.append('level', options.level);
+        if (options.monitorId) params.append('monitorId', options.monitorId);
+        if (options.format) params.append('format', options.format);
+
+        const url = `/api/logs/export${params.toString() ? '?' + params.toString() : ''}`;
+        return this.get(url);
+    }
+
+    // ================================
     // 系统相关 API
     // ================================
 

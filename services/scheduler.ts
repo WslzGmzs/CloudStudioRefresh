@@ -7,6 +7,7 @@ import type { MonitorConfig, MonitorResult } from '@/models/monitor.ts';
 import { kvService } from '@/services/kv.ts';
 import { monitorService } from '@/services/monitor.ts';
 import { globalCache, CacheUtils } from '@/services/cache.ts';
+import { logger } from '@/services/logger.ts';
 
 /**
  * 监控任务调度器
@@ -16,7 +17,7 @@ export class MonitorScheduler {
   private isRunning: boolean = false;
   private lastExecutionTime: Date | null = null;
   private executionCount: number = 0;
-  private cronJob: any = null;
+  private intervalId: number | null = null;
 
   private constructor() {}
 
@@ -41,14 +42,15 @@ export class MonitorScheduler {
 
     this.isRunning = true;
     console.log('🚀 启动监控任务调度器');
+    await logger.logSchedulerStart();
 
     // 立即执行一次监控
     await this.executeMonitoringCycle();
 
     // 设置定时任务（每分钟执行一次）
-    this.cronJob = Deno.cron('Monitor Scheduler', '* * * * *', async () => {
+    this.intervalId = setInterval(async () => {
       await this.executeMonitoringCycle();
-    });
+    }, INTERVALS.MONITOR_SCHEDULER);
 
     console.log('✅ 监控调度器启动成功');
   }
@@ -56,14 +58,21 @@ export class MonitorScheduler {
   /**
    * 停止监控调度器
    */
-  stop(): void {
+  async stop(): Promise<void> {
     if (!this.isRunning) {
       console.log('⚠️ 监控调度器未在运行');
       return;
     }
 
     this.isRunning = false;
+
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
+
     console.log('🛑 停止监控任务调度器');
+    await logger.logSchedulerStop();
   }
 
   /**

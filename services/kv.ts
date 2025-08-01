@@ -265,6 +265,89 @@ export class KVService {
       return false;
     }
   }
+
+  // ================================
+  // 系统日志相关操作
+  // ================================
+
+  /**
+   * 保存系统日志
+   */
+  async saveSystemLog(logEntry: SystemLog): Promise<boolean> {
+    try {
+      const kv = await this.getKV();
+
+      // 使用时间戳作为排序键，便于按时间查询
+      const timeKey = logEntry.timestamp.getTime().toString().padStart(20, '0');
+      const key = [KV_KEYS.SYSTEM_LOGS, timeKey, logEntry.id];
+
+      const result = await kv.set(key, logEntry);
+      return result.ok;
+    } catch (error) {
+      console.error('保存系统日志失败:', error);
+      return false;
+    }
+  }
+
+  /**
+   * 获取系统日志
+   */
+  async getSystemLogs(limit: number = 100): Promise<SystemLog[]> {
+    try {
+      const kv = await this.getKV();
+      const logs: SystemLog[] = [];
+
+      const iter = kv.list<SystemLog>({
+        prefix: [KV_KEYS.SYSTEM_LOGS],
+      }, {
+        limit,
+        reverse: true, // 最新的记录在前
+      });
+
+      for await (const entry of iter) {
+        if (entry.value) {
+          const log = entry.value;
+          log.timestamp = new Date(log.timestamp);
+          logs.push(log);
+        }
+      }
+
+      return logs;
+    } catch (error) {
+      console.error('获取系统日志失败:', error);
+      return [];
+    }
+  }
+
+  /**
+   * 清理过期日志
+   */
+  async cleanupOldLogs(daysToKeep: number = 30): Promise<number> {
+    try {
+      const kv = await this.getKV();
+      const cutoffTime = new Date(Date.now() - daysToKeep * 24 * 60 * 60 * 1000);
+      let deletedCount = 0;
+
+      const iter = kv.list<SystemLog>({
+        prefix: [KV_KEYS.SYSTEM_LOGS],
+      });
+
+      for await (const entry of iter) {
+        if (entry.value) {
+          const log = entry.value;
+          if (new Date(log.timestamp) < cutoffTime) {
+            await kv.delete(entry.key);
+            deletedCount++;
+          }
+        }
+      }
+
+      return deletedCount;
+    } catch (error) {
+      console.error('清理过期日志失败:', error);
+      return 0;
+    }
+  }
 }
 
 // 导出单例实例
