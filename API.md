@@ -1,251 +1,420 @@
-# 📡 CloudStudio 监控管理系统 API 文档
+# CloudStudio 监控系统 API 文档
 
-## API 概览
+## 概述
 
-CloudStudio 监控管理系统提供完整的 RESTful API，支持监控配置管理、系统状态查询、用户认证等功能。所有 API 都基于 JSON 格式进行数据交换。
+本文档描述了 CloudStudio 监控系统的 RESTful API 接口。系统采用前后端分离架构，所有 API 都基于 HTTP 协议，使用 JSON 格式进行数据交换。
 
 ## 🔐 认证机制
 
-### 会话认证
-所有需要认证的 API 都使用基于 Cookie 的会话认证：
+系统使用基于 Cookie 的会话认证机制：
 
-```http
-Cookie: session=your-session-id
+1. 用户通过 `/api/login` 接口登录
+2. 服务器返回会话 Cookie
+3. 后续请求自动携带 Cookie 进行认证
+4. 会话过期后需要重新登录
+
+## 📋 通用响应格式
+
+所有 API 响应都遵循统一格式：
+
+```json
+{
+  "success": true,
+  "data": {},
+  "error": null,
+  "code": null,
+  "timestamp": "2024-01-01T00:00:00.000Z"
+}
 ```
 
-### 认证流程
-1. 通过 `/api/login` 登录获取会话
-2. 后续请求自动携带会话 Cookie
-3. 会话过期后需要重新登录
+### 响应字段说明
 
-## 📋 API 端点列表
+- `success`: 请求是否成功
+- `data`: 响应数据（成功时）
+- `error`: 错误信息（失败时）
+- `code`: 错误代码（失败时）
+- `timestamp`: 响应时间戳
 
-### 页面路由
+## 🔑 认证相关 API
 
-#### GET /
-登录页面
-- **响应**: HTML 登录页面
+### 用户登录
 
-#### GET /dashboard
-管理仪表板页面
-- **响应**: HTML 仪表板页面
-- **认证**: 需要登录
+**POST** `/api/login`
 
----
+登录系统获取会话。
 
-### 认证 API
-
-#### POST /api/login
-用户登录
-
-**请求体**:
+**请求体:**
 ```json
 {
   "password": "admin123"
 }
 ```
 
-**成功响应**:
+**响应:**
 ```json
 {
   "success": true,
   "data": {
-    "sessionId": "session-uuid",
-    "expires": "2025-02-01T12:00:00.000Z"
+    "sessionId": "uuid-string"
   },
-  "message": "登录成功"
+  "timestamp": "2024-01-01T00:00:00.000Z"
 }
 ```
 
-**错误响应**:
-```json
-{
-  "success": false,
-  "data": null,
-  "message": "密码错误",
-  "code": "AUTH_FAILED"
-}
-```
+### 用户登出
 
-#### POST /api/logout
-用户登出
+**POST** `/api/logout`
 
-**响应**:
+登出系统，清除会话。
+
+**响应:**
 ```json
 {
   "success": true,
   "data": null,
-  "message": "登出成功"
+  "timestamp": "2024-01-01T00:00:00.000Z"
 }
 ```
 
-#### GET /api/auth/check
-检查认证状态
+### 检查认证状态
 
-**响应**:
+**GET** `/api/auth/status`
+
+检查当前用户的认证状态。
+
+**响应:**
 ```json
 {
   "success": true,
   "data": {
     "authenticated": true,
-    "sessionId": "session-uuid",
-    "expires": "2025-02-01T12:00:00.000Z"
-  }
+    "session": {
+      "id": "uuid-string",
+      "expires": "2024-01-02T00:00:00.000Z",
+      "lastAccessAt": "2024-01-01T12:00:00.000Z"
+    }
+  },
+  "timestamp": "2024-01-01T00:00:00.000Z"
 }
 ```
 
----
+## 📊 监控配置 API
 
-### 监控配置 API
+### 获取所有监控配置
 
-#### GET /api/monitors
-获取监控配置列表
-- **认证**: 需要登录
+**GET** `/api/monitors`
 
-**响应**:
+获取所有监控配置列表。
+
+**响应:**
 ```json
 {
   "success": true,
   "data": [
     {
-      "id": "monitor-uuid",
+      "id": "uuid-string",
       "name": "网站监控",
       "url": "https://example.com",
+      "cookie": "",
       "method": "GET",
       "interval": 5,
       "enabled": true,
-      "timeout": 30000,
-      "createdAt": "2025-01-31T10:00:00.000Z",
-      "updatedAt": "2025-01-31T10:00:00.000Z"
+      "status": "success",
+      "lastCheck": "2024-01-01T12:00:00.000Z",
+      "lastError": null,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T12:00:00.000Z"
     }
-  ]
+  ],
+  "timestamp": "2024-01-01T00:00:00.000Z"
 }
 ```
 
-#### POST /api/monitors
-创建监控配置
-- **认证**: 需要登录
+### 创建监控配置
 
-**请求体**:
+**POST** `/api/monitors`
+
+创建新的监控配置。
+
+**请求体:**
 ```json
 {
-  "name": "新监控",
+  "name": "网站监控",
   "url": "https://example.com",
+  "cookie": "",
   "method": "GET",
   "interval": 5,
-  "enabled": true,
-  "cookie": "optional-cookie",
-  "headers": {
-    "User-Agent": "CloudStudio Monitor"
-  }
+  "enabled": true
 }
 ```
 
-#### PUT /api/monitors/:id
-更新监控配置
-- **认证**: 需要登录
-- **路径参数**: `id` - 监控配置 ID
+**响应:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid-string",
+    "name": "网站监控",
+    "url": "https://example.com",
+    "cookie": "",
+    "method": "GET",
+    "interval": 5,
+    "enabled": true,
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  },
+  "timestamp": "2024-01-01T00:00:00.000Z"
+}
+```
 
-#### DELETE /api/monitors/:id
-删除监控配置
-- **认证**: 需要登录
-- **路径参数**: `id` - 监控配置 ID
+### 更新监控配置
 
-#### GET /api/monitors/status
-获取所有监控状态
-- **认证**: 需要登录
+**PUT** `/api/monitors/:id`
 
-**响应**:
+更新指定的监控配置。
+
+**请求体:**
+```json
+{
+  "name": "更新的网站监控",
+  "interval": 10,
+  "enabled": false
+}
+```
+
+### 删除监控配置
+
+**DELETE** `/api/monitors/:id`
+
+删除指定的监控配置。
+
+**响应:**
+```json
+{
+  "success": true,
+  "data": null,
+  "timestamp": "2024-01-01T00:00:00.000Z"
+}
+```
+
+### 获取监控状态
+
+**GET** `/api/monitors/status`
+
+获取所有监控的当前状态。
+
+**响应:**
 ```json
 {
   "success": true,
   "data": [
     {
-      "monitorId": "monitor-uuid",
+      "id": "uuid-string",
       "name": "网站监控",
-      "status": "online",
-      "lastCheck": "2025-01-31T12:00:00.000Z",
-      "responseTime": 150,
-      "uptime": 99.5
+      "enabled": true,
+      "status": "success",
+      "lastCheck": "2024-01-01T12:00:00.000Z",
+      "lastError": null
     }
-  ]
+  ],
+  "timestamp": "2024-01-01T00:00:00.000Z"
 }
 ```
 
----
+## 📈 统计数据 API
 
-### 系统 API
+### 获取监控统计
 
-#### GET /api/system/info
-获取系统信息
-- **认证**: 需要登录
+**GET** `/api/stats?period=24h`
 
-**响应**:
+获取监控统计数据。
+
+**查询参数:**
+- `period`: 统计周期，可选值 `24h` 或 `7d`
+
+**响应:**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "monitorId": "uuid-string",
+      "monitorName": "网站监控",
+      "period": "24h",
+      "dataPoints": [
+        {
+          "label": "00:00",
+          "success": 10,
+          "failure": 0,
+          "successRate": 100,
+          "timestamp": "2024-01-01T00:00:00.000Z"
+        }
+      ]
+    }
+  ],
+  "timestamp": "2024-01-01T00:00:00.000Z"
+}
+```
+
+### 获取概览统计
+
+**GET** `/api/stats/overview`
+
+获取系统概览统计。
+
+**响应:**
+```json
+{
+  "success": true,
+  "data": {
+    "totalMonitors": 5,
+    "enabledMonitors": 4,
+    "successMonitors": 3,
+    "errorMonitors": 1,
+    "pendingMonitors": 0
+  },
+  "timestamp": "2024-01-01T00:00:00.000Z"
+}
+```
+
+## 🔧 系统管理 API
+
+### 获取系统信息
+
+**GET** `/api/system/info`
+
+获取系统基本信息。
+
+**响应:**
 ```json
 {
   "success": true,
   "data": {
     "version": "1.0.0",
+    "name": "CloudStudio Monitor",
     "totalMonitors": 5,
-    "enabledMonitors": 3,
-    "uptime": 86400000,
+    "enabledMonitors": 4,
+    "uptime": 3600000,
     "platform": "Deno Deploy",
     "scheduler": {
       "isRunning": true,
-      "executionCount": 1440,
-      "lastExecutionTime": "2025-01-31T12:00:00.000Z"
+      "executionCount": 100,
+      "lastExecutionTime": "2024-01-01T12:00:00.000Z"
     }
-  }
+  },
+  "timestamp": "2024-01-01T00:00:00.000Z"
 }
 ```
 
-#### GET /api/system/health
-系统健康检查
+### 健康检查
 
-**响应**:
+**GET** `/api/system/health`
+
+检查系统健康状态。
+
+**响应:**
 ```json
 {
   "success": true,
   "data": {
     "status": "healthy",
-    "checks": {
-      "database": true,
-      "scheduler": true,
-      "monitorConfigs": true
+    "timestamp": "2024-01-01T12:00:00.000Z",
+    "services": {
+      "database": "healthy",
+      "monitoring": "healthy",
+      "scheduler": "running"
     },
-    "errors": []
-  }
+    "scheduler": {
+      "isRunning": true,
+      "executionCount": 100,
+      "lastExecutionTime": "2024-01-01T12:00:00.000Z"
+    }
+  },
+  "timestamp": "2024-01-01T12:00:00.000Z"
 }
 ```
 
----
+### 获取缓存统计
 
-## 📊 数据格式
+**GET** `/api/system/cache`
 
-### 标准响应格式
+获取缓存使用统计。
+
+**响应:**
 ```json
 {
-  "success": boolean,
-  "data": any | null,
-  "message": string,
-  "code": string
+  "success": true,
+  "data": {
+    "cacheSize": 10,
+    "cacheKeys": ["all_monitor_configs", "history_xxx"],
+    "timestamp": "2024-01-01T12:00:00.000Z",
+    "optimization": {
+      "description": "KV读取优化已启用",
+      "features": [
+        "监控配置缓存 (2分钟TTL)",
+        "历史记录查询缓存 (5分钟TTL)",
+        "系统日志查询缓存 (3分钟TTL)",
+        "自动刷新间隔延长至2分钟",
+        "查询结果限制和分页"
+      ]
+    }
+  },
+  "timestamp": "2024-01-01T12:00:00.000Z"
 }
 ```
 
-### 错误码列表
+### 清除缓存
 
-| 错误码 | 描述 | HTTP 状态码 |
-|--------|------|-------------|
-| `AUTH_FAILED` | 认证失败 | 401 |
-| `SESSION_EXPIRED` | 会话过期 | 401 |
-| `PERMISSION_DENIED` | 权限不足 | 403 |
-| `NOT_FOUND` | 资源不存在 | 404 |
-| `VALIDATION_ERROR` | 数据验证错误 | 400 |
-| `DATABASE_ERROR` | 数据库错误 | 500 |
-| `NETWORK_ERROR` | 网络错误 | 500 |
-| `RATE_LIMITED` | 请求频率限制 | 429 |
+**POST** `/api/system/cache/clear`
 
-## 🔧 使用示例
+清除所有缓存。
+
+**响应:**
+```json
+{
+  "success": true,
+  "data": {
+    "message": "缓存已清除",
+    "beforeSize": 10,
+    "afterSize": 0,
+    "cleared": 10
+  },
+  "timestamp": "2024-01-01T12:00:00.000Z"
+}
+```
+
+### 获取调度器状态
+
+**GET** `/api/system/scheduler`
+
+获取任务调度器状态。
+
+**响应:**
+```json
+{
+  "success": true,
+  "data": {
+    "isRunning": true,
+    "lastExecutionTime": "2024-01-01T12:00:00.000Z",
+    "executionCount": 100
+  },
+  "timestamp": "2024-01-01T12:00:00.000Z"
+}
+```
+
+## ❌ 错误代码
+
+| 代码 | 说明 |
+|------|------|
+| 1001 | 验证错误 |
+| 1002 | 认证失败 |
+| 1004 | 资源不存在 |
+| 2001 | 数据库错误 |
+| 2002 | 网络错误 |
+| 4001 | 未认证 |
+| 5001 | 内部错误 |
+
+## 📝 使用示例
 
 ### JavaScript 示例
 
@@ -257,56 +426,19 @@ const loginResponse = await fetch('/api/login', {
   body: JSON.stringify({ password: 'admin123' })
 });
 
-// 获取监控列表
-const monitorsResponse = await fetch('/api/monitors', {
-  credentials: 'include'
-});
+// 获取监控配置
+const monitorsResponse = await fetch('/api/monitors');
+const monitors = await monitorsResponse.json();
 
-// 创建监控
+// 创建监控配置
 const createResponse = await fetch('/api/monitors', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
-  credentials: 'include',
   body: JSON.stringify({
-    name: '新监控',
+    name: '网站监控',
     url: 'https://example.com',
-    method: 'GET',
     interval: 5,
     enabled: true
   })
 });
 ```
-
-### cURL 示例
-
-```bash
-# 登录
-curl -X POST http://localhost:8000/api/login \
-  -H "Content-Type: application/json" \
-  -d '{"password":"admin123"}' \
-  -c cookies.txt
-
-# 获取监控列表
-curl -X GET http://localhost:8000/api/monitors \
-  -b cookies.txt
-
-# 创建监控
-curl -X POST http://localhost:8000/api/monitors \
-  -H "Content-Type: application/json" \
-  -b cookies.txt \
-  -d '{
-    "name": "新监控",
-    "url": "https://example.com",
-    "method": "GET",
-    "interval": 5,
-    "enabled": true
-  }'
-```
-
-## 🚀 最佳实践
-
-1. **错误处理**: 始终检查 `success` 字段
-2. **认证管理**: 妥善处理会话过期
-3. **请求频率**: 避免过于频繁的 API 调用
-4. **数据验证**: 客户端也要进行数据验证
-5. **超时处理**: 设置合理的请求超时时间

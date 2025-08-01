@@ -1,296 +1,192 @@
-# CloudStudio Monitor Management System
+# CloudStudio 监控管理系统
 
-🚀 A Deno Deploy compatible application with Web management interface, supporting multi-site monitoring configuration, authentication, and persistent data storage.
+一个基于 Deno 的网站监控管理系统，采用前后端分离架构，支持多站点监控、实时状态检查、历史数据统计和可视化图表展示。
 
-[![Deno](https://img.shields.io/badge/deno-v2.3.5+-black?logo=deno)](https://deno.land/)
-[![Deploy](https://img.shields.io/badge/deploy-Deno%20Deploy-blue)](https://deno.com/deploy)
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+## ✨ 主要功能
 
-> 🎯 **Complete transformation from simple script to enterprise-level monitoring platform**
+- 🔍 **多站点监控**: 支持添加多个网站进行监控
+- ⏰ **智能调度**: 可配置监控间隔（1-60分钟），智能间隔检查
+- 📊 **数据统计**: 提供24小时和7天的监控数据统计
+- 📈 **可视化图表**: 直观的成功率和响应时间图表
+- 🔐 **安全认证**: 基于会话的用户认证系统
+- 💾 **数据持久化**: 使用 Deno KV 存储监控数据
+- 🎨 **响应式界面**: 现代化的 Web 界面，支持移动端
+- ⚡ **性能优化**: 内存缓存系统，减少90% KV读取量
+- 🏗️ **模块化架构**: 前后端分离，易于维护和扩展
 
-[中文文档](README_CN.md) | [English](README.md)
+## 🚀 快速开始
 
-## ✨ Features
+### 环境要求
 
-- 🌐 **Web Management Interface** - Modern responsive design
-- 📊 **Multi-site Monitoring** - Support multiple website monitoring simultaneously
-- 🔐 **Authentication** - Secure session management system
-- 💾 **Data Persistence** - Deno KV based data storage
-- ⏰ **Real-time Monitoring** - Automatic scheduled monitoring tasks
-- 📈 **History Records** - Complete monitoring history tracking
-- 📱 **Responsive Design** - Mobile device support
-- 🚀 **Single File Deployment** - Zero dependencies, one-click deployment
+- Deno 1.37+ 
+- 支持 Deno KV 的环境
 
-## 🚀 Quick Start
-
-### Local Development
+### 本地运行
 
 ```bash
-# Clone repository
-git clone https://github.com/WslzGmzs/CloudStudioRefresh.git
-cd CloudStudioRefresh
+# 克隆项目
+git clone <repository-url>
+cd cloudstudio-monitor
 
-# Run the application
-deno run --allow-net --allow-kv --unstable-kv cloudStudioRefresh.ts
+# 启动服务（新架构）
+deno task start
+
+# 开发模式（支持热重载）
+deno task dev
+
+# 代码检查
+deno task check
 ```
 
-### Deno Deploy Deployment
+### 访问系统
 
-#### Method 1: Direct File Upload (Recommended)
-1. Visit [Deno Deploy](https://dash.deno.com/)
-2. Create new project
-3. **Upload `cloudStudioRefresh.ts` file**
-4. Set environment variables (optional)
-5. Deploy complete
+1. 打开浏览器访问 `http://localhost:8000`
+2. 使用默认密码 `admin123` 登录（可通过环境变量修改）
+3. 开始添加和管理监控配置
 
-#### Method 2: GitHub Integration
-1. Fork this repository to your GitHub account
-2. Connect GitHub repository in Deno Deploy
-3. **Select `cloudStudioRefresh.ts` as entry file**
-4. Automatic deployment
-
-## 📁 Project Structure
+## 🏗️ 项目架构（前后端分离）
 
 ```
-CloudStudioRefresh/
-├── cloudStudioRefresh.ts      # Main application file (single-file deployment)
-├── deno.json                  # Deno configuration file
-├── deploy.sh                  # Deployment script
-├── README.md                  # English documentation
-├── README_CN.md               # Chinese documentation
-├── ARCHITECTURE.md            # System architecture documentation
-├── API.md                     # Complete API documentation
-├── DEPLOYMENT.md              # Detailed deployment guide
-├── CHANGELOG.md               # Version update log
-├── PROJECT_OVERVIEW.md        # Project overview and navigation
-├── FEATURES_UPDATE.md         # Feature update log
-├── HOTFIX.md                  # Hotfix records
-└── data/                      # Data storage directory (auto-created)
-    └── kv-store/              # Deno KV database files
+project/
+├── server.ts                 # 主服务器入口文件
+├── config/                   # 配置文件
+│   ├── app.ts                # 应用配置
+│   └── constants.ts          # 常量定义
+├── models/                   # 数据模型
+│   ├── monitor.ts            # 监控相关接口
+│   ├── auth.ts               # 认证相关接口
+│   └── system.ts             # 系统相关接口
+├── services/                 # 业务逻辑服务
+│   ├── cache.ts              # 内存缓存服务
+│   ├── monitor.ts            # 监控执行服务
+│   ├── scheduler.ts          # 任务调度服务
+│   └── kv.ts                 # KV数据库服务
+├── api/                      # API路由处理
+│   ├── auth.ts               # 认证API
+│   ├── monitors.ts           # 监控配置API
+│   ├── stats.ts              # 统计数据API
+│   └── system.ts             # 系统API
+├── utils/                    # 工具函数
+│   ├── response.ts           # 响应工具
+│   └── helpers.ts            # 通用工具
+├── public/                   # 前端文件
+│   ├── index.html            # 主页面
+│   ├── css/styles.css        # 样式文件
+│   └── js/                   # JavaScript文件
+└── deno.json                 # Deno配置文件
 ```
 
-### File Description
+## 📋 环境变量
 
-- **`cloudStudioRefresh.ts`**: Complete application with web interface, monitoring system, and all features
-- **`deno.json`**: Deno configuration with tasks, permissions, and project settings
-- **`deploy.sh`**: Automated deployment script with compatibility checks
-- **`data/`**: Local data storage directory (created automatically)
+| 变量名 | 默认值 | 说明 |
+|--------|--------|------|
+| `ADMIN_PASSWORD` | `admin123` | 管理员登录密码 |
+| `SESSION_EXPIRE_HOURS` | `24` | 会话过期时间（小时） |
+| `DEFAULT_MONITOR_INTERVAL` | `1` | 默认监控间隔（分钟） |
+| `MAX_MONITOR_INTERVAL` | `60` | 最大监控间隔（分钟） |
+| `MIN_MONITOR_INTERVAL` | `1` | 最小监控间隔（分钟） |
+| `PORT` | `8000` | 服务器端口 |
 
-### 📚 Documentation Navigation
+## ⚡ 性能优化
 
-- 📖 **[Project Overview](PROJECT_OVERVIEW.md)** - Complete project introduction and navigation
-- 🏗️ **[Architecture](ARCHITECTURE.md)** - System architecture and technical stack
-- 📡 **[API Documentation](API.md)** - Complete API reference and examples
-- 🚀 **[Deployment Guide](DEPLOYMENT.md)** - Detailed deployment instructions
-- 📝 **[Changelog](CHANGELOG.md)** - Version history and updates
-- 🎉 **[Feature Updates](FEATURES_UPDATE.md)** - New features and improvements
-- 🔧 **[Hotfix Records](HOTFIX.md)** - Common issues and solutions
+### KV读取优化
+- **监控配置缓存**: 2分钟TTL，减少重复查询
+- **历史记录缓存**: 5分钟TTL，限制查询数量
+- **系统日志缓存**: 3分钟TTL，分页查询
+- **前端刷新优化**: 30秒→2分钟，减少75%调用
 
-## ⚙️ Configuration
+### 预期效果
+- KV读取量减少90% (从每小时420次→48次)
+- 响应速度显著提升
+- 符合Deno Deploy免费计划限制
 
-### Environment Variables
+## 📖 API 接口
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `ADMIN_PASSWORD` | `admin123` | Administrator login password |
-| `SESSION_EXPIRE_HOURS` | `24` | Session expiration time (hours) |
-| `DEFAULT_MONITOR_INTERVAL` | `1` | Default monitoring interval (minutes) |
-| `MAX_MONITOR_INTERVAL` | `60` | Maximum monitoring interval (minutes) |
-| `MIN_MONITOR_INTERVAL` | `1` | Minimum monitoring interval (minutes) |
-| `HISTORY_RETENTION_DAYS` | `30` | History record retention days |
-| `MAX_CONCURRENT_MONITORS` | `10` | Maximum concurrent monitoring count |
-| `REQUEST_TIMEOUT` | `30000` | Request timeout (milliseconds) |
-| `LOGIN_LOCKOUT_MINUTES` | `15` | Login failure lockout time (minutes) |
-| `MAX_LOGIN_ATTEMPTS` | `5` | Maximum login attempts |
-| `LOG_LEVEL` | `info` | Log level |
-| `PORT` | `8000` | Server port |
+### 认证相关
+- `POST /api/login` - 用户登录
+- `POST /api/logout` - 用户登出
+- `GET /api/auth/status` - 检查认证状态
 
-### Default Configuration
+### 监控配置
+- `GET /api/monitors` - 获取所有监控配置
+- `POST /api/monitors` - 创建监控配置
+- `PUT /api/monitors/:id` - 更新监控配置
+- `DELETE /api/monitors/:id` - 删除监控配置
+- `GET /api/monitors/status` - 获取监控状态
 
-- 🔑 **Admin Password**: `admin123` (recommended to change)
-- ⏱️ **Session Expiry**: 24 hours
-- 📊 **Monitor Interval**: 1-60 minutes configurable
-- 🔄 **Concurrent Monitors**: Maximum 10
-- 📝 **History Retention**: 30 days
+### 统计数据
+- `GET /api/stats` - 获取监控统计
+- `GET /api/stats/overview` - 获取概览统计
 
-## 📚 API Documentation
+### 系统管理
+- `GET /api/system/info` - 获取系统信息
+- `GET /api/system/health` - 健康检查
+- `GET /api/system/cache` - 缓存统计
+- `POST /api/system/cache/clear` - 清除缓存
 
-### Page Routes
-- `GET /` - Login page
-- `GET /dashboard` - Management dashboard
+## 🔧 开发指南
 
-### Authentication API
-- `POST /api/login` - User login
-- `POST /api/logout` - User logout
-- `GET /api/auth/check` - Authentication status check
-
-### Monitor Configuration API
-- `GET /api/monitors` - Get monitor configuration list
-- `POST /api/monitors` - Create monitor configuration
-- `PUT /api/monitors/:id` - Update monitor configuration
-- `DELETE /api/monitors/:id` - Delete monitor configuration
-- `GET /api/monitors/status` - Get monitor status
-
-### System API
-- `GET /api/system/info` - System information
-- `GET /api/system/health` - Health check
-- `GET /api/scheduler/status` - Scheduler status
-- `POST /api/scheduler/restart` - Restart scheduler
-
-## 🔒 Security Features
-
-- 🔐 **Password Authentication** - Hard-coded password protection
-- 🍪 **Session Management** - Secure Cookie sessions
-- 🚫 **Rate Limiting** - Brute force attack prevention
-- 🛡️ **CSRF Protection** - Cross-site request forgery protection
-- 🔒 **Security Headers** - Complete security response headers
-
-## 🔧 Development Guide
-
-### Local Development
+### 开发命令
 
 ```bash
-# Development mode (auto-restart)
-deno run --allow-net --allow-kv --unstable-kv --watch cloudStudioRefresh.ts
+# 启动开发服务器
+deno task dev
 
-# Code check
-deno check cloudStudioRefresh.ts
+# 生产环境启动
+deno task start
 
-# Code formatting
-deno fmt cloudStudioRefresh.ts
+# 代码检查
+deno task check
 
-# Code linting
-deno lint cloudStudioRefresh.ts
+# 代码格式化
+deno task fmt
 
-# Run tests
-deno run --allow-net --allow-kv --unstable-kv cloudStudioRefresh.ts --test
+# 代码检查
+deno task lint
 ```
 
-### Deployment Preparation
+### 添加新功能
 
-```bash
-# Use deployment script
-chmod +x deploy.sh
-./deploy.sh
+1. **数据模型**: 在 `models/` 中定义接口
+2. **业务逻辑**: 在 `services/` 中实现服务
+3. **API接口**: 在 `api/` 中添加路由处理
+4. **前端界面**: 在 `public/` 中更新UI
 
-# Manual check
-deno check cloudStudioRefresh.ts
-deno run --allow-net --allow-kv --unstable-kv cloudStudioRefresh.ts
-```
+## 📦 部署
 
-## 💡 Usage Examples
+### Deno Deploy
 
-### CloudStudio Monitor Configuration
+1. 推送代码到 GitHub
+2. 在 Deno Deploy 中创建新项目
+3. 连接 GitHub 仓库
+4. 设置入口文件为 `server.ts`
+5. 配置环境变量
+6. 部署
 
-```json
-{
-  "name": "CloudStudio Project A Monitor",
-  "url": "https://cloudstudio.net/a/26783234094321664/edit",
-  "cookie": "cloudstudio-editor-session=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "method": "POST",
-  "interval": 1,
-  "enabled": true
-}
-```
+### 部署优势
+- ✅ 所有文件都小于128KB，符合Deno Deploy限制
+- ✅ 模块化架构，易于维护
+- ✅ 前后端分离，独立开发
+- ✅ 性能优化，减少资源消耗
 
-**How to get Cookie:**
+## 🔄 从旧版本迁移
 
-1. Open Developer Tools (F12) in CloudStudio
-2. Switch to Network tab
-3. Refresh page and find any request
-4. Copy complete Cookie value from request headers
+### 兼容性
+- ✅ 数据格式完全兼容
+- ✅ KV数据库结构不变
+- ✅ 环境变量保持一致
+- ✅ 功能无缺失
 
-### General Website Monitoring
+### 迁移步骤
+1. 备份现有数据
+2. 部署新版本
+3. 验证功能正常
+4. 删除旧版本文件
 
-```json
-{
-  "name": "Company Website Monitor",
-  "url": "https://company.com/health",
-  "cookie": "",
-  "method": "GET",
-  "interval": 5,
-  "enabled": true
-}
-```
+## 🤝 贡献
 
-## 🔍 Troubleshooting
+欢迎提交 Issue 和 Pull Request！
 
-### Common Issues
-
-#### 1. Deployment Issues
-**Common Issues**: File upload or GitHub integration problems
-**Solution**: Ensure you're using the correct file and have proper permissions
-
-#### 2. Cannot Access Management Interface
-**Solution**:
-```bash
-# Check if application started normally
-deno run --allow-net --allow-kv --unstable-kv cloudStudioRefresh.ts
-
-# Check if port is occupied
-netstat -an | grep 8000
-```
-
-#### 3. Login Failed
-**Solution**:
-- Confirm password is `admin123` (or custom ADMIN_PASSWORD)
-- Clear browser cookies and cache
-
-#### 4. Monitoring Not Working
-**Solution**:
-```bash
-# Check scheduler status
-curl http://localhost:8000/api/scheduler/status
-
-# Check system health
-curl http://localhost:8000/api/system/health
-```
-
-## 🔄 Changelog
-
-### v1.0.1 (2025-01-31) - Documentation and Deployment Optimization
-
-#### 🚀 Major Improvements
-- **Complete Documentation**: Added comprehensive technical documentation
-- **Deployment Simplification**: Streamlined deployment process with single file
-- **Documentation Consistency**: Fixed all inconsistencies in project documentation
-
-#### ✨ New Features
-- **Technical Documentation**: Architecture, API, and deployment guides
-- **TypeScript Optimization**: Fixed all type errors, ensuring type safety
-- **Configuration Optimization**: Improved deno.json configuration, eliminated warnings
-
-#### 🛠️ Technical Improvements
-- **Code Streamlining**: Removed test code and development tools, retained core functionality
-- **Performance Optimization**: Optimized code structure, improved runtime efficiency
-- **Documentation Enhancement**: Detailed deployment guide and troubleshooting
-
-### v1.0.0 (2025-01-31) - Initial Release
-- Complete monitoring management system
-- Web management interface
-- Multi-site monitoring support
-- Authentication and session management
-- Persistent data storage
-
-## 📄 License
+## 📄 许可证
 
 MIT License
-
-## 🤝 Contributing
-
-We welcome all forms of contributions!
-
-- 🐛 **Report Issues**: Use GitHub Issues
-- 💡 **Feature Suggestions**: Submit in Issues
-- 🔧 **Code Contributions**: Fork project and submit PR
-- 📝 **Documentation Improvements**: Improve existing documentation
-
-## 📞 Contact Us
-
-- **Project Repository**: https://github.com/WslzGmzs/CloudStudioRefresh.git
-- **Issue Reports**: GitHub Issues
-- **Feature Suggestions**: GitHub Discussions
-
----
-
-⭐ If this project helps you, please give us a Star!

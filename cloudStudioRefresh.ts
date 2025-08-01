@@ -368,6 +368,109 @@ type FormatDate = (date: Date) => string;
 type ValidateSession = (session: Session) => boolean;
 
 // ================================
+// 内存缓存系统
+// ================================
+
+/**
+ * 缓存条目接口
+ */
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+  ttl: number; // 生存时间（毫秒）
+}
+
+/**
+ * 内存缓存管理器
+ */
+class MemoryCache {
+  private cache = new Map<string, CacheEntry<any>>();
+  private readonly defaultTTL = 5 * 60 * 1000; // 默认5分钟
+
+  /**
+   * 设置缓存
+   */
+  set<T>(key: string, data: T, ttl?: number): void {
+    const entry: CacheEntry<T> = {
+      data,
+      timestamp: Date.now(),
+      ttl: ttl || this.defaultTTL,
+    };
+    this.cache.set(key, entry);
+  }
+
+  /**
+   * 获取缓存
+   */
+  get<T>(key: string): T | null {
+    const entry = this.cache.get(key);
+    if (!entry) {
+      return null;
+    }
+
+    // 检查是否过期
+    if (Date.now() - entry.timestamp > entry.ttl) {
+      this.cache.delete(key);
+      return null;
+    }
+
+    return entry.data as T;
+  }
+
+  /**
+   * 删除缓存
+   */
+  delete(key: string): boolean {
+    return this.cache.delete(key);
+  }
+
+  /**
+   * 清理过期缓存
+   */
+  cleanup(): number {
+    let cleanedCount = 0;
+    const now = Date.now();
+
+    for (const [key, entry] of this.cache.entries()) {
+      if (now - entry.timestamp > entry.ttl) {
+        this.cache.delete(key);
+        cleanedCount++;
+      }
+    }
+
+    return cleanedCount;
+  }
+
+  /**
+   * 获取缓存统计
+   */
+  getStats(): { size: number; keys: string[] } {
+    return {
+      size: this.cache.size,
+      keys: Array.from(this.cache.keys()),
+    };
+  }
+
+  /**
+   * 清空所有缓存
+   */
+  clear(): void {
+    this.cache.clear();
+  }
+}
+
+// 全局缓存实例
+const globalCache = new MemoryCache();
+
+// 定期清理过期缓存（每10分钟）
+setInterval(() => {
+  const cleaned = globalCache.cleanup();
+  if (cleaned > 0) {
+    console.log(`🧹 清理了 ${cleaned} 个过期缓存条目`);
+  }
+}, 10 * 60 * 1000);
+
+// ================================
 // 工具函数实现
 // ================================
 
@@ -396,6 +499,41 @@ const validateUrl: ValidateUrl = (url: string): boolean => {
 const validateInterval: ValidateInterval = (interval: number): boolean => {
   return interval >= APP_CONFIG.MIN_MONITOR_INTERVAL &&
     interval <= APP_CONFIG.MAX_MONITOR_INTERVAL;
+};
+
+/**
+ * 检查监控是否应该执行
+ * @param config 监控配置
+ * @returns 是否应该执行
+ */
+const shouldExecuteMonitor = (config: MonitorConfig): boolean => {
+  // 如果没有上次检查时间，应该立即执行
+  if (!config.lastCheck) {
+    return true;
+  }
+
+  // 计算距离上次检查的时间（分钟）
+  const now = new Date();
+  const lastCheck = new Date(config.lastCheck);
+  const timeDiffMinutes = Math.floor((now.getTime() - lastCheck.getTime()) / (1000 * 60));
+
+  // 如果超过配置的间隔时间，应该执行
+  return timeDiffMinutes >= config.interval;
+};
+
+/**
+ * 计算监控下次执行时间
+ * @param config 监控配置
+ * @returns 下次执行时间
+ */
+const getNextExecutionTime = (config: MonitorConfig): Date => {
+  if (!config.lastCheck) {
+    return new Date(); // 立即执行
+  }
+
+  const lastCheck = new Date(config.lastCheck);
+  const nextExecution = new Date(lastCheck.getTime() + (config.interval * 60 * 1000));
+  return nextExecution;
 };
 
 /**
@@ -522,7 +660,7 @@ async function saveSystemLog(logEntry: SystemLog): Promise<boolean> {
 }
 
 /**
- * 获取系统日志
+ * 获取系统日志（优化版）
  * @param options 查询选项
  * @returns 日志列表
  */
@@ -531,49 +669,84 @@ async function getSystemLogs(options: {
   monitorId?: string;
   limit?: number;
   offset?: number;
-}): Promise<{ logs: SystemLog[]; total: number }> {
+  useCache?: boolean;
+} = {}): Promise<{ logs: SystemLog[]; total: number }> {
+  // 设置默认值
+  const {
+    level,
+    monitorId,
+    limit = 50, // 默认限制50条
+    offset = 0,
+    useCache = true,
+  } = options;
+
+  const cacheKey = `system_logs_${level || 'all'}_${monitorId || 'all'}_${limit}_${offset}`;
+
+  // 尝试从缓存获取
+  if (useCache) {
+    const cached = globalCache.get<{ logs: SystemLog[]; total: number }>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+  }
+
   try {
     const db = await ensureKV();
     const logs: SystemLog[] = [];
     let count = 0;
+    let processedCount = 0;
+    const maxProcessCount = 500; // 限制最大处理数量
 
     const iter = db.list<SystemLog>({
       prefix: [KV_KEYS.SYSTEM_LOGS],
     }, {
       reverse: true, // 最新的在前
+      limit: maxProcessCount, // 限制查询数量
     });
 
     for await (const entry of iter) {
-      if (entry.value) {
+      if (entry.value && processedCount < maxProcessCount) {
         const log = entry.value;
         log.timestamp = new Date(log.timestamp);
 
         // 应用过滤条件
-        if (options.level && log.level !== options.level) {
+        if (level && log.level !== level) {
+          processedCount++;
           continue;
         }
 
-        if (options.monitorId && log.monitorId !== options.monitorId) {
+        if (monitorId && log.monitorId !== monitorId) {
+          processedCount++;
           continue;
         }
 
         count++;
 
         // 应用分页
-        if (options.offset && count <= options.offset) {
+        if (count <= offset) {
+          processedCount++;
           continue;
         }
 
         logs.push(log);
 
         // 应用限制
-        if (options.limit && logs.length >= options.limit) {
+        if (logs.length >= limit) {
           break;
         }
+
+        processedCount++;
       }
     }
 
-    return { logs, total: count };
+    const result = { logs, total: count };
+
+    // 缓存结果（3分钟TTL）
+    if (useCache) {
+      globalCache.set(cacheKey, result, 3 * 60 * 1000);
+    }
+
+    return result;
   } catch (error) {
     console.error('获取系统日志失败:', error);
     return { logs: [], total: 0 };
@@ -1003,6 +1176,10 @@ async function saveMonitorConfig(config: MonitorConfig): Promise<boolean> {
 
     if (result.ok) {
       console.log(`✅ 监控配置已保存: ${config.name} (${config.id})`);
+
+      // 清除相关缓存
+      globalCache.delete('all_monitor_configs');
+
       return true;
     } else {
       console.error(`❌ 监控配置保存失败: ${config.name}`);
@@ -1044,10 +1221,21 @@ async function getMonitorConfig(id: string): Promise<MonitorConfig | null> {
 }
 
 /**
- * 获取所有监控配置
+ * 获取所有监控配置（带缓存）
+ * @param useCache 是否使用缓存
  * @returns 监控配置列表
  */
-async function getAllMonitorConfigs(): Promise<MonitorConfig[]> {
+async function getAllMonitorConfigs(useCache: boolean = true): Promise<MonitorConfig[]> {
+  const cacheKey = 'all_monitor_configs';
+
+  // 尝试从缓存获取
+  if (useCache) {
+    const cached = globalCache.get<MonitorConfig[]>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+  }
+
   try {
     const db = await ensureKV();
     const configs: MonitorConfig[] = [];
@@ -1070,6 +1258,11 @@ async function getAllMonitorConfigs(): Promise<MonitorConfig[]> {
 
     // 按创建时间排序
     configs.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+
+    // 缓存结果（2分钟TTL）
+    if (useCache) {
+      globalCache.set(cacheKey, configs, 2 * 60 * 1000);
+    }
 
     return configs;
   } catch (error) {
@@ -2198,6 +2391,9 @@ async function handleDashboard(request: Request): Promise<Response> {
 
         .section-header{padding:1.5rem;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center}
         .section-title{font-size:1.25rem;font-weight:600;color:#2d3748}
+        .section-actions{display:flex;gap:0.5rem;align-items:center}
+        .refresh-btn{background:#10b981;color:white;border:none;padding:0.75rem 1.5rem;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:500;transition:background 0.2s ease}
+        .refresh-btn:hover{background:#059669}
         .add-btn{background:#667eea;color:white;border:none;padding:0.75rem 1.5rem;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:500;transition:background 0.2s ease}
         .add-btn:hover{background:#5a67d8}
         .monitors-list{padding:1.5rem}
@@ -2322,7 +2518,10 @@ async function handleDashboard(request: Request): Promise<Response> {
           <div class="monitors-section">
             <div class="section-header">
               <h2 class="section-title">监控配置</h2>
-              <button id="addMonitorBtn" class="add-btn">+ 添加监控</button>
+              <div class="section-actions">
+                <button id="refreshDashboardBtn" class="refresh-btn" title="手动刷新数据">🔄 刷新</button>
+                <button id="addMonitorBtn" class="add-btn">+ 添加监控</button>
+              </div>
             </div>
 
             <div class="monitors-list">
@@ -2937,6 +3136,24 @@ async function handleDashboard(request: Request): Promise<Response> {
           showModal();
         });
 
+        // 手动刷新按钮
+        const refreshDashboardBtn = document.getElementById('refreshDashboardBtn');
+        refreshDashboardBtn.addEventListener('click', async () => {
+          refreshDashboardBtn.disabled = true;
+          refreshDashboardBtn.textContent = '🔄 刷新中...';
+
+          try {
+            await loadMonitors();
+            await loadOverviewChart();
+            console.log('✅ 仪表板数据已刷新');
+          } catch (error) {
+            console.error('❌ 刷新数据失败:', error);
+          } finally {
+            refreshDashboardBtn.disabled = false;
+            refreshDashboardBtn.textContent = '🔄 刷新';
+          }
+        });
+
         closeModal.addEventListener('click', hideModal);
         cancelBtn.addEventListener('click', hideModal);
 
@@ -2994,13 +3211,13 @@ async function handleDashboard(request: Request): Promise<Response> {
           // 初始化仪表板页面
           switchPage('dashboard');
 
-          // 定期刷新监控状态（每30秒）
+          // 定期刷新监控状态（每2分钟）
           setInterval(() => {
             if (currentPage === 'dashboard') {
               loadMonitors();
               loadOverviewChart();
             }
-          }, 30000);
+          }, 120000); // 2分钟 = 120000毫秒
         });
 
         // 全局函数（供 onclick 使用）
@@ -3314,6 +3531,11 @@ async function routeHandler(request: Request): Promise<Response> {
         return await handleSystemHealthAPI(request);
       }
 
+      // 缓存统计 API
+      if (path === '/api/system/cache' && method === 'GET') {
+        return await handleCacheStatsAPI(request);
+      }
+
       // 监控调度器 API
       if (path === '/api/scheduler/status' && method === 'GET') {
         return await handleSchedulerStatusAPI(request);
@@ -3579,6 +3801,51 @@ async function handleSystemHealthAPI(request: Request): Promise<Response> {
     console.error('❌ 健康检查错误:', error);
     return createJsonResponse(
       createApiResponse(false, null, '健康检查失败', ERROR_CODES.NETWORK_ERROR),
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+    );
+  }
+}
+
+/**
+ * 处理缓存统计 API
+ * @param request HTTP 请求
+ * @returns Response 对象
+ */
+async function handleCacheStatsAPI(request: Request): Promise<Response> {
+  try {
+    // 检查认证
+    const authResult = await requireAuth(request);
+    if (!authResult.authenticated) {
+      return createJsonResponse(
+        createApiResponse(false, null, '未认证', ERROR_CODES.UNAUTHORIZED),
+        HTTP_STATUS.UNAUTHORIZED,
+      );
+    }
+
+    const cacheStats = globalCache.getStats();
+    const stats = {
+      cacheSize: cacheStats.size,
+      cacheKeys: cacheStats.keys,
+      timestamp: new Date().toISOString(),
+      optimization: {
+        description: 'KV读取优化已启用',
+        features: [
+          '监控配置缓存 (2分钟TTL)',
+          '历史记录查询缓存 (5分钟TTL)',
+          '系统日志查询缓存 (3分钟TTL)',
+          '自动刷新间隔延长至2分钟',
+          '查询结果限制和分页',
+        ],
+      },
+    };
+
+    return createJsonResponse(
+      createApiResponse(true, stats),
+    );
+  } catch (error) {
+    console.error('❌ 获取缓存统计错误:', error);
+    return createJsonResponse(
+      createApiResponse(false, null, '获取缓存统计失败', ERROR_CODES.NETWORK_ERROR),
       HTTP_STATUS.INTERNAL_SERVER_ERROR,
     );
   }
@@ -3854,34 +4121,66 @@ async function generateMonitorStats(
 }
 
 /**
- * 获取指定时间范围内的监控历史记录
+ * 获取指定时间范围内的监控历史记录（优化版）
  * @param monitorId 监控配置 ID
  * @param startTime 开始时间
  * @param endTime 结束时间
+ * @param useCache 是否使用缓存
  * @returns 历史记录列表
  */
 async function getMonitorHistoryInRange(
   monitorId: string,
   startTime: Date,
   endTime: Date,
+  useCache: boolean = true,
 ): Promise<MonitorHistory[]> {
+  const cacheKey = `history_${monitorId}_${startTime.getTime()}_${endTime.getTime()}`;
+
+  // 尝试从缓存获取
+  if (useCache) {
+    const cached = globalCache.get<MonitorHistory[]>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+  }
+
   try {
     const db = await ensureKV();
     const histories: MonitorHistory[] = [];
+    let processedCount = 0;
+    const maxProcessCount = 1000; // 限制最大处理数量
 
     const iter = db.list<MonitorHistory>({
       prefix: [KV_KEYS.HISTORY, monitorId],
+    }, {
+      limit: maxProcessCount, // 限制查询数量
+      reverse: true, // 从最新开始查询
     });
 
     for await (const entry of iter) {
-      if (entry.value) {
+      if (entry.value && processedCount < maxProcessCount) {
         const history = entry.value;
         history.timestamp = new Date(history.timestamp);
 
         if (history.timestamp >= startTime && history.timestamp < endTime) {
           histories.push(history);
         }
+
+        // 如果时间戳已经早于开始时间，可以停止查询
+        if (history.timestamp < startTime) {
+          break;
+        }
+
+        processedCount++;
       }
+    }
+
+    // 按时间排序
+    histories.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+
+    // 缓存结果（5分钟TTL）
+    if (useCache) {
+      globalCache.set(cacheKey, histories, 5 * 60 * 1000);
     }
 
     return histories;
@@ -4020,8 +4319,37 @@ class MonitorScheduler {
 
       console.log(`📊 发现 ${enabledConfigs.length} 个启用的监控配置`);
 
+      // 检查哪些监控任务需要执行（基于间隔时间）
+      const configsToExecute = enabledConfigs.filter((config) => shouldExecuteMonitor(config));
+      const skippedConfigs = enabledConfigs.filter((config) => !shouldExecuteMonitor(config));
+
+      // 输出执行计划
+      if (configsToExecute.length > 0) {
+        console.log(`🚀 需要执行 ${configsToExecute.length} 个监控任务:`);
+        configsToExecute.forEach((config) => {
+          const lastCheckStr = config.lastCheck
+            ? new Date(config.lastCheck).toLocaleString('zh-CN')
+            : '从未执行';
+          console.log(`  - ${config.name} (间隔: ${config.interval}分钟, 上次检查: ${lastCheckStr})`);
+        });
+      }
+
+      if (skippedConfigs.length > 0) {
+        console.log(`⏭️ 跳过 ${skippedConfigs.length} 个监控任务 (未到执行时间):`);
+        skippedConfigs.forEach((config) => {
+          const nextExecution = getNextExecutionTime(config);
+          const nextExecutionStr = nextExecution.toLocaleString('zh-CN');
+          console.log(`  - ${config.name} (下次执行: ${nextExecutionStr})`);
+        });
+      }
+
+      if (configsToExecute.length === 0) {
+        console.log('⏸️ 本次周期无需执行任何监控任务');
+        return;
+      }
+
       // 执行监控任务
-      const results = await this.executeMonitorTasks(enabledConfigs);
+      const results = await this.executeMonitorTasks(configsToExecute);
 
       // 更新监控配置状态
       await this.updateMonitorStatuses(results);
@@ -4030,7 +4358,8 @@ class MonitorScheduler {
       const successCount = results.filter((r) => r.success).length;
       const failureCount = results.length - successCount;
 
-      console.log(`✅ 监控周期完成: 成功 ${successCount} 个，失败 ${failureCount} 个\n`);
+      console.log(`✅ 监控周期完成: 执行 ${results.length} 个任务，成功 ${successCount} 个，失败 ${failureCount} 个`);
+      console.log(`📊 总配置: ${enabledConfigs.length} 个启用，${skippedConfigs.length} 个跳过\n`);
     } catch (error) {
       console.error('❌ 监控周期执行错误:', error);
     }

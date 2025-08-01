@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudStudio 监控管理系统</title>
+    <link rel="stylesheet" href="/public/css/styles.css">
+    <link rel="icon" href="/public/assets/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <!-- 登录页面 -->
+    <div id="loginPage" class="login-container">
+        <div class="login-box">
+            <h1 class="login-title">CloudStudio 监控系统</h1>
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="password">管理员密码</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="login-btn">登录</button>
+            </form>
+            <div id="loginError" class="error-message" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- 主应用页面 -->
+    <div id="mainApp" class="main-app" style="display: none;">
+        <!-- 导航栏 -->
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h1>CloudStudio 监控系统</h1>
+            </div>
+            <div class="nav-menu">
+                <button id="navDashboard" class="nav-btn active">仪表板</button>
+                <button id="navMonitors" class="nav-btn">监控配置</button>
+                <button id="navLogs" class="nav-btn">系统日志</button>
+                <button id="navSettings" class="nav-btn">系统设置</button>
+                <button id="logoutBtn" class="nav-btn logout">登出</button>
+            </div>
+        </nav>
+
+        <!-- 主内容区域 -->
+        <main class="main-content">
+            <!-- 仪表板页面 -->
+            <div id="dashboardPage" class="page active">
+                <div class="page-header">
+                    <h2>监控仪表板</h2>
+                    <button id="refreshDashboard" class="btn btn-secondary">🔄 刷新</button>
+                </div>
+
+                <!-- 概览统计 -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="totalMonitors">-</div>
+                            <div class="stat-label">总监控数</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="successMonitors">-</div>
+                            <div class="stat-label">正常监控</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">❌</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="errorMonitors">-</div>
+                            <div class="stat-label">异常监控</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏸️</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="pendingMonitors">-</div>
+                            <div class="stat-label">待检查</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 监控列表 -->
+                <div class="monitors-section">
+                    <div class="section-header">
+                        <h3>监控状态</h3>
+                        <button id="addMonitorBtn" class="btn btn-primary">+ 添加监控</button>
+                    </div>
+                    <div id="monitorsList" class="monitors-list">
+                        <div class="loading">加载中...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 监控配置页面 -->
+            <div id="monitorsPage" class="page">
+                <div class="page-header">
+                    <h2>监控配置管理</h2>
+                    <button id="addMonitorBtn2" class="btn btn-primary">+ 添加监控</button>
+                </div>
+                <div id="monitorsTable" class="table-container">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+
+            <!-- 系统日志页面 -->
+            <div id="logsPage" class="page">
+                <div class="page-header">
+                    <h2>系统日志</h2>
+                    <div class="log-filters">
+                        <select id="logLevelFilter">
+                            <option value="">所有级别</option>
+                            <option value="INFO">信息</option>
+                            <option value="WARN">警告</option>
+                            <option value="ERROR">错误</option>
+                        </select>
+                        <button id="refreshLogs" class="btn btn-secondary">刷新</button>
+                    </div>
+                </div>
+                <div id="logsContainer" class="logs-container">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+
+            <!-- 系统设置页面 -->
+            <div id="settingsPage" class="page">
+                <div class="page-header">
+                    <h2>系统设置</h2>
+                </div>
+                <div class="settings-grid">
+                    <div class="setting-card">
+                        <h3>缓存管理</h3>
+                        <div id="cacheStats" class="cache-stats">
+                            <div class="loading">加载中...</div>
+                        </div>
+                        <button id="clearCacheBtn" class="btn btn-warning">清除缓存</button>
+                    </div>
+                    <div class="setting-card">
+                        <h3>调度器状态</h3>
+                        <div id="schedulerStatus" class="scheduler-status">
+                            <div class="loading">加载中...</div>
+                        </div>
+                    </div>
+                    <div class="setting-card">
+                        <h3>系统信息</h3>
+                        <div id="systemInfo" class="system-info">
+                            <div class="loading">加载中...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 监控配置模态框 -->
+    <div id="monitorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">添加监控配置</h3>
+                <button id="closeModal" class="close-btn">&times;</button>
+            </div>
+            <form id="monitorForm" class="modal-form">
+                <div class="form-group">
+                    <label for="monitorName">监控名称</label>
+                    <input type="text" id="monitorName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="monitorUrl">目标 URL</label>
+                    <input type="url" id="monitorUrl" name="url" required>
+                </div>
+                <div class="form-group">
+                    <label for="monitorCookie">Cookie (可选)</label>
+                    <textarea id="monitorCookie" name="cookie" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="monitorMethod">请求方法</label>
+                    <select id="monitorMethod" name="method">
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                        <option value="HEAD">HEAD</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="monitorInterval">监控间隔 (分钟)</label>
+                    <input type="number" id="monitorInterval" name="interval" min="1" max="60" value="5">
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="monitorEnabled" name="enabled" checked>
+                        启用监控
+                    </label>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="cancelBtn" class="btn btn-secondary">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 加载脚本 -->
+    <script src="/public/js/api.js"></script>
+    <script src="/public/js/app.js"></script>
+</body>
+</html>

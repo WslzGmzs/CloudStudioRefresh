@@ -4,14 +4,22 @@
   "description": "CloudStudio 监控管理系统 - 具备 Web 管理界面的 Deno Deploy 兼容应用",
   "author": "CloudStudio Monitor Team",
   "license": "MIT",
-  "exports": "./cloudStudioRefresh.ts",
+  "exports": "./server.ts",
   "tasks": {
-    "start": "deno run --allow-net --allow-kv cloudStudioRefresh.ts",
-    "test": "deno run --allow-net --allow-kv cloudStudioRefresh.ts --test",
-    "dev": "deno run --allow-net --allow-kv --watch cloudStudioRefresh.ts",
-    "check": "deno check cloudStudioRefresh.ts",
-    "fmt": "deno fmt cloudStudioRefresh.ts README.md",
-    "lint": "deno lint cloudStudioRefresh.ts"
+    "start": "deno run --allow-net --allow-kv --allow-read --allow-write server.ts",
+    "dev": "deno run --allow-net --allow-kv --allow-read --allow-write --watch server.ts",
+    "check": "deno check server.ts",
+    "fmt": "deno fmt **/*.ts **/*.js public/**/*.html README.md",
+    "lint": "deno lint **/*.ts",
+    "legacy": "deno run --allow-net --allow-kv cloudStudioRefresh.ts"
+  },
+  "imports": {
+    "@/": "./",
+    "@/config/": "./config/",
+    "@/models/": "./models/",
+    "@/services/": "./services/",
+    "@/api/": "./api/",
+    "@/utils/": "./utils/"
   },
   "permissions": {
     "net": true,
@@ -39,9 +47,15 @@
   },
   "deploy": {
     "project": "cloudstudio-monitor",
-    "entrypoint": "cloudStudioRefresh.ts",
+    "entrypoint": "server.ts",
     "include": [
-      "cloudStudioRefresh.ts",
+      "server.ts",
+      "config/",
+      "models/",
+      "services/",
+      "api/",
+      "utils/",
+      "public/",
       "README.md",
       "README_CN.md",
       "deno.json",
@@ -54,7 +68,10 @@
       "*.log",
       ".git/",
       "node_modules/",
-      "*.tmp"
+      "*.tmp",
+      "*.backup",
+      "test_*.ts",
+      "cloudStudioRefresh.ts"
     ]
   }
 }
